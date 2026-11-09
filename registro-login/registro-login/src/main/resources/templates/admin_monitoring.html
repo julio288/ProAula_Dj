@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" th:content="${monitoringRefreshSeconds}">
+    <title>Monitoreo de Infraestructura y Red LAN | LogiTrans Security & Freight S.A.S.</title>
+    <meta name="theme-color" content="#070a10">
+    <!-- Google Fonts: Inter & JetBrains Mono para acabado profesional SOC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        :root {
+            --soc-bg: #070a10;
+            --soc-card: #0d121c;
+            --soc-card-border: rgba(255, 255, 255, 0.08);
+            --soc-cyan: #06b6d4;
+            --soc-cyan-glow: rgba(6, 182, 212, 0.25);
+            --soc-green: #10b981;
+            --soc-green-glow: rgba(16, 185, 129, 0.25);
+            --soc-red: #f43f5e;
+            --soc-red-glow: rgba(244, 63, 94, 0.25);
+            --soc-amber: #f59e0b;
+        }
+
+        body.admin-page {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            background-color: var(--soc-bg) !important;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(114, 128, 255, 0.07) 0px, transparent 50%),
+                radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.03) 0, transparent 70%) !important;
+        }
+
+        /* Barra de estado superior estilo NOC */
+        .soc-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(13, 18, 28, 0.85);
+            border: 1px solid var(--soc-card-border);
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 24px;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .soc-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #e2e8f0;
+        }
+        .soc-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--soc-green);
+            box-shadow: 0 0 10px var(--soc-green);
+            animation: pulse-dot 2s infinite ease-in-out;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        /* Banner Hero Mejorado */
+        .soc-hero {
+            position: relative;
+            background: linear-gradient(135deg, rgba(16, 23, 37, 0.95), rgba(9, 13, 22, 0.98));
+            border: 1px solid var(--soc-card-border);
+            border-radius: 18px;
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .soc-hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+        .soc-hero-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            margin: 4px 0 10px;
+            line-height: 1.15;
+        }
+        .soc-hero-title span {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .soc-hero-desc {
+            color: #94a3b8;
+            max-width: 620px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Grid de Servicios */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 18px;
+            margin-bottom: 34px;
+        }
+        .service-card {
+            position: relative;
+            background: var(--soc-card);
+            border: 1px solid var(--soc-card-border);
+            border-radius: 16px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.5);
+        }
+        .service-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 16px 36px -12px rgba(6, 182, 212, 0.2);
+        }
+        .service-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--indicator-color, #64748b);
+        }
+        .service-card.is-up {
+            --indicator-color: linear-gradient(90deg, #10b981, #06b6d4);
+        }
+        .service-card.is-down {
+            --indicator-color: linear-gradient(90deg, #f43f5e, #fb7185);
+        }
+        .service-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .service-name {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .service-icon {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .badge-status {
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 6px currentColor;
+        }
+        .status-up {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .status-down {
+            background: rgba(244, 63, 94, 0.12);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+        .status-pending {
+            background: rgba(148, 163, 184, 0.1);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        .integration-empty {
+            grid-column: 1 / -1;
+            padding: 28px;
+            border: 1px dashed rgba(148, 163, 184, 0.25);
+            border-radius: 14px;
+            color: #94a3b8;
+            background: rgba(13, 18, 28, 0.55);
+            text-align: center;
+            line-height: 1.6;
+        }
+        .event-source-note {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--soc-card-border);
+            color: #cbd5e1;
+            font-size: 0.84rem;
+            background: rgba(255, 255, 255, 0.025);
+        }
+        .service-desc {
+            color: #94a3b8;
+            font-size: 0.86rem;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+        .service-host {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: baseline;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            margin: -8px 0 16px;
+        }
+        .service-host code {
+            color: #cbd5e1;
+            overflow-wrap: anywhere;
+        }
+        .service-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.82rem;
+        }
+        .port-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .latency-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--soc-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        /* Tabla de Auditoría SOC */
+        .soc-table-card {
+            background: var(--soc-card);
+            border: 1px solid var(--soc-card-border);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+            margin-bottom: 32px;
+        }
+        .soc-table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 26px;
+            background: rgba(18, 25, 38, 0.7);
+            border-bottom: 1px solid var(--soc-card-border);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .soc-table-title h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 4px;
+        }
+        .soc-table-title p {
+            font-size: 0.84rem;
+            color: #94a3b8;
+            margin: 0;
+        }
+        .soc-filter-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .soc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+        .soc-table th {
+            padding: 14px 20px;
+            background: rgba(9, 13, 20, 0.85);
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--soc-card-border);
+        }
+        .soc-table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+            vertical-align: middle;
+        }
+        .soc-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .soc-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .soc-table tbody tr.is-threat {
+            background: rgba(244, 63, 94, 0.08);
+            border-left: 3px solid var(--soc-red);
+        }
+        .time-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .ip-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84rem;
+            color: var(--soc-cyan);
+            font-weight: 600;
+        }
+        .event-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #e2e8f0;
+        }
+
+        .sev-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .sev-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+        .sev-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .sev-critical { background: rgba(244, 63, 94, 0.18); color: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.2); }
+
+    </style>
+</head>
+<body class="admin-page">
+<div class="page-shell app-shell">
+    <header th:replace="~{fragments/admin-shell :: sidebar('monitoring')}"></header>
+
+    <main>
+        <section class="soc-status-bar" aria-live="polite">
+            <div class="soc-pill">
+                <span class="soc-dot" th:style="${monitoringSummary.unavailableServices > 0 ? 'background: var(--soc-red); box-shadow: 0 0 10px var(--soc-red);' : (monitoringSummary.configuredServices == 0 ? 'background: #94a3b8; box-shadow: none; animation: none;' : '')}"></span>
+                <span>ESTADO DE RED: <strong style="color: #fff;" th:text="${monitoringSummary.statusLabel}">ESPERANDO SONDEO</strong></span>
+            </div>
+            <div class="soc-pill">
+                <span>SERVICIOS: <strong style="color: #38bdf8;" th:text="${monitoringSummary.availableServices + ' / ' + monitoringSummary.configuredServices}">0 / 0</strong></span>
+                <span style="opacity: 0.4;">|</span>
+                <span>ÚLTIMA COMPROBACIÓN:
+                    <strong style="color: #cbd5e1;"
+                            th:text="${monitoringSummary.lastCheckedAt != null ? #temporals.format(monitoringSummary.lastCheckedAt, 'yyyy-MM-dd HH:mm:ss') : 'Esperando primer sondeo'}">Esperando primer sondeo</strong>
+                </span>
+            </div>
+            <div class="soc-pill">
+                <span>WINDOWS EVENT LOG: <strong style="color: #cbd5e1;" th:text="${eventLogStatus.status}">PENDIENTE</strong></span>
+            </div>
+        </section>
+
+        <!-- Banner Principal Hero -->
+        <section class="soc-hero">
+            <div>
+                <p class="eyebrow" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; margin-bottom: 8px;">LOGITRANS CYBERSECURITY &amp; NETWORKS OPERATIONS CENTER</p>
+                <h1 class="soc-hero-title">Centro de Control &amp; <span>Monitoreo LAN</span></h1>
+                <p class="soc-hero-desc">Comprobación periódica de conectividad TCP, lectura de eventos del sistema Windows y clasificación inicial de alertas. Los destinos se definen en la configuración de despliegue; el panel no publica valores de muestra.</p>
+                <div class="cta-row" style="margin-top: 20px;">
+                    <a class="button primary" th:href="@{/admin/monitoring}" style="background: linear-gradient(135deg, #06b6d4, #3b82f6); border: none; box-shadow: 0 10px 24px -6px rgba(6, 182, 212, 0.4);">
+                        <span style="font-size: 1.1rem;">↻</span> Recargar panel
+                    </a>
+                    <a class="button secondary" href="#network-events" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); color: #fff;">
+                        Ver eventos del sistema
+                    </a>
+                </div>
+            </div>
+            <aside class="hero-aside admin-aside" style="background: rgba(13, 18, 28, 0.7); border: 1px solid var(--soc-card-border); border-radius: 16px; padding: 20px 24px;">
+                <span style="color: #cbd5e1; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">SERVICIOS DISPONIBLES</span>
+                <div style="font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff; margin: 10px 0 4px;"
+                     th:text="${monitoringSummary.availableServices + ' / ' + monitoringSummary.configuredServices}">0 / 0</div>
+                <span class="demo-note" style="color: #94a3b8; font-size: 0.8rem;"
+                      th:text="${monitoringSummary.lastCheckedAt != null ? 'Último sondeo: ' + #temporals.format(monitoringSummary.lastCheckedAt, 'HH:mm:ss') : 'Esperando la primera comprobación programada.'}">Esperando sondeo</span>
+            </aside>
+        </section>
+
+        <!-- Alertas del Sistema -->
+        <div class="alert alert-success" role="status" th:if="${message}" th:text="${message}" style="border-radius: 12px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #6ee7b7;"></div>
+
+        <!-- Malla de Servicios Críticos -->
+        <div class="section-heading" style="margin-bottom: 16px;">
+            <div>
+                <p class="eyebrow" style="color: var(--soc-cyan);">Estado de infraestructura</p>
+                <h2 style="font-size: 1.4rem; color: #fff;">Servicios de red</h2>
+            </div>
+            <span class="section-caption" style="color: #94a3b8;"
+                  th:text="${'Actualización automática cada ' + monitoringRefreshSeconds + ' segundos'}">Actualización automática</span>
+        </div>
+
+        <section class="services-grid">
+            <article class="service-card" th:each="service : ${networkServices}"
+                     th:classappend="${service.reachable ? 'is-up' : 'is-down'}">
+                <div>
+                    <div class="service-card-top">
+                        <h3 class="service-name">
+                            <span class="service-icon" aria-hidden="true">NET</span>
+                            <span th:text="${service.name}"></span>
+                        </h3>
+                        <span class="badge-status"
+                              th:classappend="${service.reachable ? 'status-up' : 'status-down'}"
+                              th:text="${service.statusLabel}"></span>
+                    </div>
+                    <p class="service-desc" th:text="${service.details}"></p>
+                    <p class="service-host">
+                        <span>HOST:</span>
+                        <code th:text="${service.host}"></code>
+                    </p>
+                </div>
+                <div class="service-footer">
+                    <span class="port-tag">
+                        <span style="color: #94a3b8;">PUERTO:</span> <strong th:text="${service.port}"></strong>/<span th:text="${service.protocol}"></span>
+                    </span>
+                    <span class="latency-badge" th:text="${service.latencyMs} + ' ms'"></span>
+                </div>
+            </article>
+            <div class="integration-empty" th:if="${monitoringSummary.configuredServices == 0}">
+                No hay destinos configurados para monitoreo.<br>
+                Define los servicios autorizados en la variable de despliegue <code>MONITORING_TARGETS</code>.
+            </div>
+            <div class="integration-empty" th:if="${monitoringSummary.configuredServices > 0 and #lists.isEmpty(networkServices)}">
+                Los destinos están configurados. Se mostrarán al terminar el primer sondeo.
+            </div>
+        </section>
+
+        <section class="soc-table-card">
+            <span id="network-events"></span>
+            <div class="soc-table-header">
+                <div class="soc-table-title">
+                    <h2>Bitácora de eventos de red</h2>
+                    <p>Eventos obtenidos desde Windows Event Log y alertas generadas por cambios de disponibilidad.</p>
+                </div>
+                <div class="soc-filter-btns">
+                    <a th:href="@{/admin/monitoring(filter='all')}"
+                       class="button button-compact"
+                       th:style="${activeFilter == 'all' ? 'background: var(--soc-cyan); color: #000; font-weight: 700;' : 'background: rgba(255,255,255,0.06); color: #fff;'}">Todos los Eventos</a>
+                    <a th:href="@{/admin/monitoring(filter='anomalies')}"
+                       class="button button-compact"
+                       th:style="${activeFilter == 'anomalies' ? 'background: var(--soc-red); color: #fff; font-weight: 700; box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);' : 'background: rgba(255,255,255,0.06); color: #fff;'}">Solo anomalías</a>
+                </div>
+            </div>
+            <div class="event-source-note" role="status" th:text="${eventLogStatus.message}">Estado de Windows Event Log</div>
+
+            <div style="overflow-x: auto;">
+                <table class="soc-table">
+                    <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Severidad</th>
+                        <th>Servicio</th>
+                        <th>Host / IP</th>
+                        <th>Evento</th>
+                        <th>Detalle</th>
+                        <th>Clasificación</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="log : ${auditLogs}"
+                        th:classappend="${log.anomaly ? 'is-threat' : ''}">
+                        <td class="time-cell" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td>
+                            <span class="sev-tag"
+                                  th:classappend="${log.level == 'INFO' ? 'sev-info' : (log.level == 'WARNING' ? 'sev-warning' : 'sev-critical')}"
+                                  th:text="${log.level}"></span>
+                        </td>
+                        <td style="font-weight: 700; color: #f8fafc;" th:text="${log.service}"></td>
+                        <td class="ip-cell" th:text="${log.sourceIp}"></td>
+                        <td><span class="event-cell" th:text="${log.eventType}"></span></td>
+                        <td style="max-width: 380px; line-height: 1.45; color: #e2e8f0;" th:text="${log.message}"></td>
+                        <td>
+                            <span th:if="${log.anomaly}" class="badge-status status-down">ANOMALÍA</span>
+                            <span th:unless="${log.anomaly}" class="badge-status status-up">NORMAL</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(auditLogs)}">
+                        <td colspan="7" class="integration-empty">
+                            Aún no hay eventos registrados. Las nuevas alertas aparecerán aquí después de los sondeos o la lectura de logs.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+    <footer th:replace="~{fragments/admin-shell :: footer}"></footer>
+</div>
+</body>
+</html>

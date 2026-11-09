@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rutas y tarifas | LogiTrans Security & Freight</title>
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
+</head>
+<body class="admin-page">
+<div class="page-shell app-shell">
+    <header th:replace="~{fragments/admin-shell :: sidebar('routes')}"></header>
+    <main>
+        <section class="page-intro">
+            <p class="eyebrow">Cobertura y precios</p>
+            <h1>Rutas y tarifas</h1>
+            <p class="lead">Administra los trayectos que pueden elegir los clientes y las tarifas que se usan para calcular sus cotizaciones.</p>
+        </section>
+        <div class="alert alert-success" role="status" th:if="${message}" th:text="${message}"></div>
+        <div class="alert alert-error" role="alert" th:if="${error}" th:text="${error}"></div>
+        <div class="alert alert-error" role="alert" th:if="${formError}" th:text="${formError}"></div>
+        <section class="content-section admin-columns">
+            <div>
+                <div class="section-heading"><div><p class="eyebrow">Cobertura publicada</p><h2 th:text="|${#lists.size(lanes)} rutas|">Rutas</h2></div></div>
+                <div class="admin-list">
+                    <article class="admin-item route-admin-card" th:each="lane : ${lanes}">
+                        <div class="admin-item-heading">
+                            <div><span class="route-symbol" aria-hidden="true">⌁</span><strong th:text="|${lane.origin} → ${lane.destination}|">Origen → Destino</strong></div>
+                            <span class="status-pill" th:text="${lane.active ? 'Activa' : 'Pausada'}">Activa</span>
+                        </div>
+                        <form class="inline-edit-form grid-form" th:action="@{/admin/lanes/{id}/edit(id=${lane.id})}" method="post">
+                            <div class="form-group"><label th:for="|origin-${lane.id}|">Origen</label><input th:id="|origin-${lane.id}|" name="origin" th:value="${lane.origin}" maxlength="80" required></div>
+                            <div class="form-group"><label th:for="|destination-${lane.id}|">Destino</label><input th:id="|destination-${lane.id}|" name="destination" th:value="${lane.destination}" maxlength="80" required></div>
+                            <div class="form-group"><label th:for="|schedule-${lane.id}|">Horario</label><input th:id="|schedule-${lane.id}|" name="schedule" th:value="${lane.schedule}" maxlength="100" required></div>
+                            <div class="form-group"><label th:for="|days-${lane.id}|">Días de tránsito</label><input th:id="|days-${lane.id}|" type="number" name="transitDays" th:value="${lane.transitDays}" min="1" required></div>
+                            <div class="form-group"><label th:for="|price-${lane.id}|">COP por kg</label><input th:id="|price-${lane.id}|" type="number" name="pricePerKg" th:value="${lane.pricePerKg}" min="0.01" step="0.01" required></div>
+                            <div class="form-group"><label th:for="|minimum-${lane.id}|">Tarifa mínima COP</label><input th:id="|minimum-${lane.id}|" type="number" name="minimumPrice" th:value="${lane.minimumPrice}" min="0.01" step="0.01" required></div>
+                            <div class="button-row full-width"><button class="button secondary button-compact" type="submit">Guardar cambios</button></div>
+                        </form>
+                        <form th:action="@{/admin/lanes/{id}/toggle(id=${lane.id})}" method="post">
+                            <button class="text-button" type="submit" th:text="${lane.active ? 'Pausar ruta' : 'Activar ruta'}">Pausar ruta</button>
+                        </form>
+                    </article>
+                    <div class="empty-state" th:if="${#lists.isEmpty(lanes)}">Aún no hay rutas. Agrega la primera para habilitar solicitudes de envío.</div>
+                </div>
+            </div>
+            <form class="form-card admin-form" th:action="@{/admin/lanes}" th:object="${laneForm}" method="post">
+                <p class="eyebrow">Nueva cobertura</p><h2>Agregar ruta</h2>
+                <p class="form-description">Al publicarla, el trayecto estará disponible en el formulario de cotización.</p>
+                <div class="form-group"><label for="new-origin">Ciudad de origen</label><input id="new-origin" th:field="*{origin}" maxlength="80" required></div>
+                <div class="form-group"><label for="new-destination">Ciudad de destino</label><input id="new-destination" th:field="*{destination}" maxlength="80" required></div>
+                <div class="form-group"><label for="new-schedule">Horario de despacho</label><input id="new-schedule" th:field="*{schedule}" maxlength="100" required placeholder="Lun-Vie · 08:00"></div>
+                <div class="form-group"><label for="new-days">Días estimados</label><input id="new-days" type="number" th:field="*{transitDays}" min="1" required></div>
+                <div class="form-group"><label for="new-price">Tarifa por kg (COP)</label><input id="new-price" type="number" th:field="*{pricePerKg}" min="0.01" step="0.01" required></div>
+                <div class="form-group"><label for="new-minimum">Tarifa mínima (COP)</label><input id="new-minimum" type="number" th:field="*{minimumPrice}" min="0.01" step="0.01" required></div>
+                <button class="button primary" type="submit">Publicar ruta</button>
+            </form>
+        </section>
+    </main>
+    <footer th:replace="~{fragments/admin-shell :: footer}"></footer>
+</div>
+</body>
+</html>

@@ -3,43 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mi perfil</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>Mi perfil | LogiTrans Security & Freight</title>
+    <meta name="theme-color" content="#f2f8fa">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/customer.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
 </head>
-<body>
-<div class="page-shell auth-shell">
-    <div class="auth-card">
-        <div class="auth-header">
-            <p class="eyebrow">Cuenta personal</p>
-            <h1>Mi perfil</h1>
-            <p class="lead">Mantén actualizados tus datos de acceso y contacto.</p>
+<body class="profile-page">
+<main class="page-shell profile-shell">
+    <section class="auth-card profile-card">
+        <a class="brand auth-brand profile-brand" th:href="@{/dashboard}">
+            <span class="brand-mark" aria-hidden="true">LT</span><span>LogiTrans <strong>Security &amp; Freight</strong></span>
+        </a>
+        <div class="profile-intro">
+            <div class="profile-avatar" aria-hidden="true"
+                 th:text="${(profileForm.firstName != null and !#strings.isEmpty(profileForm.firstName) ? #strings.substring(profileForm.firstName, 0, 1) : 'U') + (profileForm.lastName != null and !#strings.isEmpty(profileForm.lastName) ? #strings.substring(profileForm.lastName, 0, 1) : '')}">US</div>
+            <div class="auth-header">
+                <p class="eyebrow">Tu cuenta · Información personal</p>
+                <h1>Mi perfil</h1>
+                <p class="lead">Mantén tus datos de contacto actualizados para gestionar tus envíos.</p>
+            </div>
         </div>
-
         <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
         <div class="alert alert-error" th:if="${formError}" th:text="${formError}"></div>
-
         <form th:action="@{/profile}" th:object="${profileForm}" method="post" class="auth-form">
-            <div class="form-group">
-                <label for="email">Correo electrónico</label>
-                <input id="email" type="email" th:field="*{email}" required maxlength="100">
-                <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            <div class="profile-fields-grid">
+                <div class="form-group profile-field-wide">
+                    <label for="email">Correo electrónico</label>
+                    <input id="email" type="email" th:field="*{email}" required maxlength="100" autocomplete="email">
+                    <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="firstName">Nombre</label>
+                    <input id="firstName" type="text" th:field="*{firstName}" required minlength="2" maxlength="50" autocomplete="given-name">
+                    <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Apellido</label>
+                    <input id="lastName" type="text" th:field="*{lastName}" required minlength="2" maxlength="50" autocomplete="family-name">
+                    <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="firstName">Nombre</label>
-                <input id="firstName" type="text" th:field="*{firstName}" required minlength="2" maxlength="50">
-                <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
-            </div>
-            <div class="form-group">
-                <label for="lastName">Apellido</label>
-                <input id="lastName" type="text" th:field="*{lastName}" required minlength="2" maxlength="50">
-                <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
-            </div>
-            <div class="button-row">
-                <button class="button primary" type="submit">Guardar cambios</button>
-                <a class="button secondary" th:href="@{/dashboard}">Volver al panel</a>
+            <div class="profile-form-footer">
+                <p>La información solo se actualizará al guardar los cambios.</p>
+                <div class="button-row">
+                    <button class="button primary" type="submit">Guardar cambios <span aria-hidden="true">→</span></button>
+                    <a class="button secondary" th:href="@{/dashboard}">Volver al panel</a>
+                </div>
             </div>
         </form>
-    </div>
-</div>
+    </section>
+</main>
 </body>
 </html>

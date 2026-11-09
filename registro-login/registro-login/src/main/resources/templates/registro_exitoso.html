@@ -3,21 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Registro exitoso</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>Cuenta creada | LogiTrans Security & Freight</title>
+    <meta name="theme-color" content="#f7f3ea">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
 </head>
-<body>
+<body class="auth-page success-page">
 <div class="page-shell auth-shell">
-    <div class="auth-card success-card">
-        <div class="success-icon">✓</div>
-        <p class="eyebrow">Proceso completado</p>
-        <h1>Registro exitoso</h1>
-        <p>El usuario fue registrado correctamente en el sistema.</p>
-        <div class="button-row">
-            <a class="button primary" th:href="@{/login}">Iniciar sesión</a>
-            <a th:href="@{/}" class="button secondary">Inicio</a>
-        </div>
-    </div>
+    <section class="stage">
+        <a class="brand stage-brand" th:href="@{/}"><span class="brand-mark" aria-hidden="true">LT</span><span>LogiTrans <strong>Security &amp; Freight</strong></span></a>
+        <div class="chip" aria-hidden="true"><i></i>Cuenta confirmada · Lista para usar</div>
+        <svg class="scene success-art" viewBox="0 0 600 440" aria-hidden="true" focusable="false">
+            <defs>
+                <linearGradient id="success-box" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8d49b"/><stop offset="1" stop-color="#c8813d"/></linearGradient>
+                <linearGradient id="success-seal" x1="0" x2="1"><stop stop-color="#76e7c8"/><stop offset="1" stop-color="#45b99f"/></linearGradient>
+                <filter id="success-shadow" x="-.5" y="-.5" width="2" height="2"><feGaussianBlur stdDeviation="10"/></filter>
+            </defs>
+            <circle class="success-halo" cx="305" cy="220" r="158"/>
+            <circle class="success-orbit" cx="305" cy="220" r="143"/>
+            <ellipse cx="305" cy="345" rx="120" ry="18" fill="#060d1b" opacity=".42" filter="url(#success-shadow)"/>
+            <g class="success-parcel">
+                <path d="m211 224 94-48 94 48-94 51z" fill="#f3c987" stroke="#ffe2b4" stroke-width="2"/>
+                <path d="m211 224 94 51v75l-94-54z" fill="url(#success-box)" stroke="#f4c783" stroke-width="2"/>
+                <path d="m305 275 94-51v73l-94 53z" fill="#ac682f" stroke="#e9ac68" stroke-width="2"/>
+                <path d="m274 192 31-16 31 16-31 17z" fill="#ffe1ad"/>
+                <path d="M305 209v66" stroke="#ffdfa9" stroke-width="2" opacity=".8"/>
+                <path d="m332 291 51-28v38l-51 29z" fill="#fff8eb"/>
+                <path d="m341 295 31-17m-31 24 31-17m-31 24 22-12" stroke="#465b6d" stroke-width="2"/>
+            </g>
+            <g class="success-seal">
+                <circle cx="305" cy="202" r="43" fill="#102442" stroke="#8cebd3" stroke-width="2"/>
+                <circle cx="305" cy="202" r="34" fill="url(#success-seal)" fill-opacity=".16" stroke="#74e4c9" stroke-dasharray="2 5"/>
+                <path class="success-check" d="m286 203 13 13 26-29" fill="none" stroke="#86f0d7" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <g class="success-confetti">
+                <path d="m171 175 8-12 8 12zm261 5 7-12 8 12zM195 290l9-4-1 10zm197-126 9-4-1 10z" fill="#d5b5f0"/>
+                <circle cx="213" cy="144" r="4" fill="#8debd5"/><circle cx="405" cy="283" r="5" fill="#f4c77c"/>
+                <circle cx="435" cy="227" r="3" fill="#8debd5"/><circle cx="177" cy="244" r="3" fill="#f4c77c"/>
+            </g>
+        </svg>
+        <div class="stage-copy"><h2>Un nuevo comienzo, bien preparado.</h2><p>Tu cuenta está lista para ayudarte a cuidar cada envío.</p></div>
+    </section>
+    <section class="auth-card success-card">
+        <a class="brand auth-brand" th:href="@{/}"><span class="brand-mark" aria-hidden="true">LT</span><span>LogiTrans <strong>Security &amp; Freight</strong></span></a>
+        <div class="success-icon" aria-hidden="true">✓</div>
+        <p class="eyebrow">Todo listo</p>
+        <h1>Tu cuenta fue creada</h1>
+        <p>Ya puedes iniciar sesión para preparar y consultar tus solicitudes de envío.</p>
+        <div class="button-row"><a class="button primary" th:href="@{/login}">Iniciar sesión</a><a th:href="@{/}" class="button secondary">Ir al inicio</a></div>
+    </section>
 </div>
 </body>
 </html>

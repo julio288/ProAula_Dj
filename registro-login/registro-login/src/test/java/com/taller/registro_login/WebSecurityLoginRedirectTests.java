@@ -1,6 +1,7 @@
 package com.taller.registro_login;
 
 import com.taller.registro_login.model.User;
+import com.taller.registro_login.repository.FreightRequestRepository;
 import com.taller.registro_login.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,15 +27,19 @@ class WebSecurityLoginRedirectTests {
     private UserRepository userRepository;
 
     @Autowired
+    private FreightRequestRepository freightRequestRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
+        freightRequestRepository.deleteAll();
         userRepository.deleteAll();
     }
 
     @Test
-    void adminShouldBeRedirectedToDashboardAfterLogin() throws Exception {
+    void adminShouldBeRedirectedToAdminPanelAfterLogin() throws Exception {
         User admin = new User(
                 "admin@demo.com",
                 passwordEncoder.encode("Password123"),
@@ -49,7 +54,7 @@ class WebSecurityLoginRedirectTests {
                         .param("email", "admin@demo.com")
                         .param("password", "Password123"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/dashboard"));
+                .andExpect(redirectedUrl("/admin"));
     }
 
     @Test

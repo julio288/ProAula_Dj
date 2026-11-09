@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Acceso restringido</title>
+    <meta name="theme-color" content="#0a1128">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
+</head>
+<body class="access-page">
+<main class="page-shell access-denied-shell">
+    <a class="brand auth-brand" th:href="@{/}">
+        <span class="brand-mark" aria-hidden="true">LT</span><span>LogiTrans <strong>Security &amp; Freight</strong></span>
+    </a>
+    <div class="access-denied-banner">
+        <strong>CONTROL DE AUTORIZACIÓN</strong>
+        <span class="access-denied-code">HTTP 403</span>
+    </div>
+
+    <section class="hero-card access-denied-card" aria-labelledby="access-denied-title">
+        <div class="access-denied-copy">
+            <span class="access-denied-icon" aria-hidden="true">🔒</span>
+            <p class="eyebrow access-denied-eyebrow">Identidad verificada · Permiso insuficiente</p>
+            <h1 id="access-denied-title">Tu cuenta no puede entrar a esta sección.</h1>
+            <p class="lead" sec:authorize="isAuthenticated()">
+                Iniciaste sesión correctamente, pero el panel de administración está reservado
+                exclusivamente para cuentas con rol ADMIN.
+            </p>
+            <p class="lead" sec:authorize="!isAuthenticated()">
+                El panel de administración está reservado exclusivamente para cuentas con rol
+                ADMIN. Inicia sesión con una cuenta autorizada para continuar.
+            </p>
+            <div class="cta-row">
+                <a class="button primary" th:href="@{/dashboard}">Volver a mi panel</a>
+                <form th:action="@{/logout}" method="post">
+                    <button class="button secondary" type="submit">Cerrar sesión</button>
+                </form>
+            </div>
+        </div>
+
+        <aside class="access-denied-details" aria-label="Detalle de autorización">
+            <h2>Detalle de acceso</h2>
+            <div class="access-denied-detail" sec:authorize="isAuthenticated()">
+                <span>Estado de identidad</span>
+                <strong class="access-denied-status">Autenticada</strong>
+            </div>
+            <div class="access-denied-detail" sec:authorize="isAuthenticated()">
+                <span>Cuenta</span>
+                <strong sec:authentication="name">usuario@correo.com</strong>
+            </div>
+            <div class="access-denied-detail">
+                <span>Recurso solicitado</span>
+                <strong>Panel de administración</strong>
+            </div>
+            <div class="access-denied-detail">
+                <span>Rol requerido</span>
+                <strong class="access-denied-required">ADMIN</strong>
+            </div>
+            <p class="access-denied-note">
+                Si necesitas administrar usuarios, solicita que un administrador revise los
+                permisos de tu cuenta.
+            </p>
+        </aside>
+    </section>
+</main>
+</body>
+</html>

@@ -3,32 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Administración</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>Resumen administrativo | LogiTrans Security & Freight</title>
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
 </head>
-<body>
-<div class="page-shell table-shell">
-    <div class="topbar">
-        <div class="user-greeting">
-            <span>Administración</span>
-            <strong th:text="${fullName}">Administrador</strong>
-        </div>
-        <form th:action="@{/logout}" method="post" class="logout-form">
-            <button type="submit" class="button secondary">Cerrar sesión</button>
-        </form>
-    </div>
-
-    <main class="hero-card">
-        <div class="hero-copy">
-            <p class="eyebrow">Acceso exclusivo para administradores</p>
-            <h1>Centro de administración</h1>
-            <p class="lead">Gestiona las cuentas registradas y vuelve a tu espacio personal cuando lo necesites.</p>
-            <div class="cta-row">
-                <a th:href="@{/users}" class="button primary">Gestionar usuarios</a>
-                <a th:href="@{/dashboard}" class="button secondary">Volver al panel</a>
+<body class="admin-page">
+<div class="page-shell app-shell">
+    <header th:replace="~{fragments/admin-shell :: sidebar('overview')}"></header>
+    <main>
+        <section class="hero-card admin-hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Centro de control</p>
+                <h1>Hola, <span th:text="${fullName}">Administrador</span>.</h1>
+                <p class="lead">Aquí tienes una lectura rápida de la operación. Cada área tiene su propio espacio para que encuentres lo importante sin ruido.</p>
+                <div class="cta-row">
+                    <a class="button primary" th:href="@{/admin/shipments}">Revisar envíos <span aria-hidden="true">→</span></a>
+                    <a class="button secondary" th:href="@{/admin/reports}">Ver reportes</a>
+                </div>
             </div>
+            <aside class="hero-aside admin-aside">
+                <span class="live"><i></i>Panel administrativo</span>
+                <span class="hero-aside-icon" aria-hidden="true">⌘</span>
+                <span class="demo-note">Acceso autorizado para administradores</span>
+            </aside>
+        </section>
+
+        <div class="metrics-grid admin-metrics">
+            <a class="metric-card metric-link" th:href="@{/admin/shipments}">
+                <span class="metric-icon" aria-hidden="true">↗</span><span class="metric-label">Por atender</span>
+                <strong th:text="${openRequestCount}">0</strong><small>Solicitudes recibidas o cotizadas</small>
+            </a>
+            <a class="metric-card metric-link" th:href="@{/admin/routes}">
+                <span class="metric-icon" aria-hidden="true">⌁</span><span class="metric-label">Rutas</span>
+                <strong th:text="${laneCount}">0</strong><small>Trayectos configurados</small>
+            </a>
+            <a class="metric-card metric-link" th:href="@{/users}">
+                <span class="metric-icon" aria-hidden="true">◎</span><span class="metric-label">Cuentas</span>
+                <strong th:text="${userCount}">0</strong><small>Usuarios registrados</small>
+            </a>
+            <a class="metric-card metric-link" th:href="@{/admin/notices}">
+                <span class="metric-icon" aria-hidden="true">◉</span><span class="metric-label">Avisos</span>
+                <strong th:text="${noticeCount}">0</strong><small>Publicaciones para clientes</small>
+            </a>
+            <a class="metric-card metric-link" th:href="@{/admin/monitoring}" style="--c: #22d3ee;">
+                <span class="metric-icon" aria-hidden="true" style="color: #22d3ee;">🛡️</span><span class="metric-label" style="color: #22d3ee;">Red &amp; Servidor</span>
+                <strong>Monitoreo</strong><small>Consulta destinos y eventos configurados</small>
+            </a>
         </div>
+
+        <div class="alert alert-success" role="status" th:if="${message}" th:text="${message}"></div>
+        <div class="alert alert-error" role="alert" th:if="${error}" th:text="${error}"></div>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <div><p class="eyebrow">Acceso directo</p><h2>¿Qué necesitas gestionar?</h2></div>
+                <span class="section-caption">Cada tarea, en su propio espacio</span>
+            </div>
+            <div class="admin-quick-grid">
+                <a class="quick-card" th:href="@{/admin/monitoring}"><span class="quick-icon" style="background: rgba(34,211,238,0.15); color: #22d3ee;">00</span><span><strong>Monitoreo de Red</strong><small>Consulta conectividad TCP, estado de servicios y eventos de Windows configurados.</small></span><b aria-hidden="true">→</b></a>
+                <a class="quick-card" th:href="@{/admin/shipments}"><span class="quick-icon">01</span><span><strong>Solicitudes y envíos</strong><small>Revisa clientes, trayectos y actualiza estados.</small></span><b aria-hidden="true">→</b></a>
+                <a class="quick-card" th:href="@{/users}"><span class="quick-icon">02</span><span><strong>Gestión de usuarios</strong><small>Consulta cuentas, roles e información de contacto.</small></span><b aria-hidden="true">→</b></a>
+                <a class="quick-card" th:href="@{/admin/routes}"><span class="quick-icon">03</span><span><strong>Rutas y tarifas</strong><small>Controla cobertura, horarios y precios publicados.</small></span><b aria-hidden="true">→</b></a>
+                <a class="quick-card" th:href="@{/admin/notices}"><span class="quick-icon">04</span><span><strong>Información para clientes</strong><small>Publica avisos visibles en la experiencia de usuario.</small></span><b aria-hidden="true">→</b></a>
+                <a class="quick-card" th:href="@{/admin/reports}"><span class="quick-icon">05</span><span><strong>Reportes</strong><small>Consulta el resumen de actividad y distribución de estados.</small></span><b aria-hidden="true">→</b></a>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <div><p class="eyebrow">Actividad reciente</p><h2>Últimas solicitudes</h2></div>
+                <a class="text-link" th:href="@{/admin/shipments}">Ver todas <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="table-card table-scroll">
+                <table>
+                    <thead><tr><th>Seguimiento</th><th>Cliente</th><th>Trayecto</th><th>Estado</th><th>Fecha</th></tr></thead>
+                    <tbody>
+                    <tr th:each="request : ${recentRequests}">
+                        <td><strong class="tracking-code" th:text="${request.trackingCode}">CO-DEMO-0001</strong></td>
+                        <td th:text="${request.customer.fullName}">Cliente</td>
+                        <td th:text="|${request.lane.origin} → ${request.lane.destination}|">Origen → Destino</td>
+                        <td><span class="status-pill" th:classappend="${#strings.toLowerCase(#strings.replace(request.status.name(), '_', '-'))}" th:text="${request.status.label}">Recibida</span></td>
+                        <td th:text="${#temporals.format(request.createdAt, 'dd/MM/yyyy')}">01/01/2026</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(recentRequests)}"><td colspan="5" class="table-empty">Aún no hay solicitudes. Las nuevas aparecerán aquí.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
+    <footer th:replace="~{fragments/admin-shell :: footer}"></footer>
 </div>
 </body>
 </html>

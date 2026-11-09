@@ -1,62 +1,231 @@
 <!DOCTYPE html>
-<html lang="es"
-    xmlns:th="http://www.thymeleaf.org"
-    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Inicio | Sistema de usuarios</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>LogiTrans Security &amp; Freight S.A.S. | Plataforma Logística &amp; Servidor Seguro</title>
+    <meta name="theme-color" content="#0a1128">
+    <!-- Google Fonts Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
+    <style>
+        body.marketing-page {
+            font-family: 'Inter', -apple-system, sans-serif !important;
+        }
+        .security-badge-strip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            width: fit-content;
+            margin-bottom: 22px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .security-badge-strip strong {
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .pulse-live {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            display: inline-block;
+        }
+        .features-grid-pro {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+        .feature-card-pro {
+            background: linear-gradient(145deg, rgba(21, 26, 38, 0.9), rgba(13, 17, 26, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 26px;
+            transition: all 0.28s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card-pro:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.6);
+        }
+        .feature-icon-pro {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
+            display: grid;
+            place-items: center;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+        .feature-card-pro h3 {
+            color: #ffffff;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0 0 8px;
+        }
+        .feature-card-pro p {
+            color: #94a3b8;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin: 0;
+        }
+        .arch-strip {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+            padding: 20px 24px;
+            background: rgba(13, 18, 28, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .arch-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+        .arch-item span {
+            font-family: 'JetBrains Mono', monospace;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+    </style>
 </head>
-<body>
-<div class="page-shell">
+<body class="marketing-page">
+<div class="page-shell app-shell">
     <header class="top-header">
-        <div class="brand">
-            <span class="brand-mark">U</span>
-            <span>Usuarios</span>
-        </div>
-        <nav class="main-nav">
-            <a th:href="@{/register}">Registrar</a>
-            <a th:href="@{/login}">Iniciar sesión</a>
-            <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}">Panel de usuarios</a>
+        <a class="brand" th:href="@{/}">
+            <span class="brand-mark" aria-hidden="true">LT</span>
+            <span>LogiTrans <strong>Security &amp; Freight</strong></span>
+        </a>
+        <nav class="main-nav" aria-label="Navegación principal">
+            <a href="#servicios"><span class="nav-glyph"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19.5h16M6.5 16V9m5.5 7V4m5.5 12v-5"/></svg></span><span>Servicios</span></a>
+            <a href="#infraestructura"><span class="nav-glyph"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20V8l8-4 8 4v12M8 20v-6h8v6M9 9h.01M15 9h.01"/></svg></span><span>Infraestructura</span></a>
+            <a class="nav-action nav-register" th:href="@{/register}"><span class="nav-action-glyph"><svg class="nav-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0m4-8v8m-4-4h8"/></svg></span><span>Crear cuenta</span><span class="nav-action-arrow" aria-hidden="true">→</span></a>
+            <a class="button primary button-compact nav-action nav-login" th:href="@{/login}"><span class="nav-action-glyph"><svg class="nav-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13 5h6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6"/><path d="M3 12h12m-5-5 5 5-5 5"/></svg></span><span>Iniciar sesión</span></a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" style="color: #38bdf8; font-weight: 700;">Panel Administración ➔</a>
         </nav>
     </header>
 
-    <main class="hero-card">
-        <div class="hero-copy">
-            <p class="eyebrow">Sistema administrativo</p>
-            <h1>Gestiona accesos con una experiencia clara y segura.</h1>
-            <p class="lead">Un flujo de registro y autenticación pensado para ser útil, limpio y profesional, con una base sólida para crecer sin perder velocidad ni confianza.</p>
-            <div class="cta-row">
-                <a class="button primary" th:href="@{/register}">Crear cuenta</a>
-                <a class="button secondary" th:href="@{/login}">Iniciar sesión</a>
+    <main>
+        <section class="hero-card customer-hero">
+            <div class="hero-copy">
+                <div class="security-badge-strip">
+                    <span class="pulse-live" style="background: #94a3b8; box-shadow: none;"></span>
+                    <span>Monitoreo: <strong>Conectividad y eventos configurados</strong></span>
+                </div>
+                <p class="eyebrow" style="color: #38bdf8;">Logística Corporativa &amp; Ciberseguridad · Barranquilla / Colombia</p>
+                <h1>LogiTrans Freight,<span>logística inteligente y red segura.</span></h1>
+                <p class="lead">Plataforma para gestionar solicitudes de carga, rutas y avisos, con un panel administrativo que presenta el estado de conectividad y los eventos de red configurados para el entorno.</p>
+                <div class="cta-row">
+                    <a class="button primary action-button" th:href="@{/register}"><span class="action-glyph"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0m4-8v8m-4-4h8"/></svg></span><span class="action-copy"><strong>Crear mi cuenta</strong><small>Acceso para clientes</small></span><span class="action-index" aria-hidden="true">↗</span></a>
+                    <a class="button secondary action-button" th:href="@{/login}"><span class="action-glyph"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13 5h6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6"/><path d="M3 12h12m-5-5 5 5-5 5"/></svg></span><span class="action-copy"><strong>Iniciar sesión</strong><small>Ya tengo una cuenta</small></span><span class="action-index" aria-hidden="true">→</span></a>
+                    <a class="button secondary" th:if="${googleLoginEnabled}"
+                       th:href="@{/oauth2/authorization/google}">Continuar con Google</a>
+                </div>
+                <p class="demo-note">Proyecto de Aula · TGRCSI Semestre V · Caso de Estudio Empresarial</p>
             </div>
-        </div>
+            <aside class="hero-aside">
+                <svg class="scene parcel-flow-scene" viewBox="0 0 600 440" aria-hidden="true" focusable="false">
+                    <defs>
+                        <linearGradient id="conveyor" x1="0" x2="1"><stop stop-color="#29456d"/><stop offset=".5" stop-color="#152a4a"/><stop offset="1" stop-color="#29456d"/></linearGradient>
+                        <linearGradient id="carton" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd78c"/><stop offset="1" stop-color="#db8e35"/></linearGradient>
+                        <linearGradient id="carton-side" x1="0" x2="1"><stop stop-color="#bd7130"/><stop offset="1" stop-color="#955327"/></linearGradient>
+                        <linearGradient id="scan-beam" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#71f6dc" stop-opacity="0"/><stop offset=".5" stop-color="#71f6dc" stop-opacity=".68"/><stop offset="1" stop-color="#71f6dc" stop-opacity="0"/></linearGradient>
+                    </defs>
+                    <g class="conveyor-belt">
+                        <path d="M70 330h460v60H70z" fill="url(#conveyor)"/>
+                        <path d="M70 330h460" stroke="#5b8bb8" stroke-width="4" stroke-dasharray="14 10"/>
+                    </g>
+                    <g class="parcel-scanner">
+                        <path d="M175 287V178a24 24 0 0 1 24-24h215a24 24 0 0 1 24 24v109" fill="none" stroke="#7ea2c8" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M175 287V178a24 24 0 0 1 24-24h215a24 24 0 0 1 24 24v109" fill="none" stroke="#4fe2c5" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 10" opacity=".9"/>
+                        <g class="parcel-scan-sweep"><path d="M183 169h247v14H183z" fill="url(#scan-beam)"/><path d="M190 176h233" stroke="#7af6db" stroke-width="2" opacity=".9"/></g>
+                    </g>
+                    <g class="parcel-box">
+                        <path d="M218 219 307 174l90 45-90 49z" fill="url(#carton)" stroke="#ffe0a6" stroke-width="2"/>
+                        <path d="m218 219 89 49v91l-89-51z" fill="#d78a37" stroke="#f6bf72" stroke-width="2"/>
+                        <path d="m307 268 90-49v89l-90 51z" fill="url(#carton-side)" stroke="#e9a754" stroke-width="2"/>
+                    </g>
+                </svg>
+            </aside>
+        </section>
 
-        <div class="feature-panel">
-            <div class="feature-item">
-                <span class="feature-icon">✓</span>
-                <div>
-                    <strong>Registro seguro</strong>
-                    <small>Validación de datos y contraseñas</small>
-                </div>
+        <!-- Capacidades de monitoreo disponibles; los destinos se configuran durante el despliegue. -->
+        <section class="arch-strip" id="infraestructura">
+            <div class="arch-item">
+                <span>RED:</span> Sondeo TCP configurable
             </div>
-            <div class="feature-item">
-                <span class="feature-icon">�</span>
-                <div>
-                    <strong>Acceso controlado</strong>
-                    <small>Autenticación con niveles de seguridad</small>
-                </div>
+            <div class="arch-item">
+                <span>ESTADO:</span> Disponibilidad y latencia medidas
             </div>
-            <div class="feature-item">
-                <span class="feature-icon">📊</span>
-                <div>
-                    <strong>Gestión de usuarios</strong>
-                    <small>Consulta y administración desde un panel</small>
-                </div>
+            <div class="arch-item">
+                <span>EVENTOS:</span> Windows Event Log
             </div>
-        </div>
+            <div class="arch-item">
+                <span>ALERTAS:</span> Cambios de conectividad y eventos relevantes
+            </div>
+            <div class="arch-item">
+                <span>ACTUALIZACIÓN:</span> Intervalo configurable
+            </div>
+        </section>
+
+        <!-- Sección de Capacidades -->
+        <section id="servicios" class="content-section" style="margin-top: 48px;">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow" style="color: #38bdf8;">Pilares del Proyecto</p>
+                    <h2 style="font-size: 1.6rem; color: #fff;">Infraestructura Segura &amp; Gestión Logística</h2>
+                </div>
+                <span class="section-caption">Diseñado según requerimientos de seguridad NIST e ISO 27001</span>
+            </div>
+
+            <div class="features-grid-pro">
+                <article class="feature-card-pro">
+                    <div class="feature-icon-pro">🛡️</div>
+                    <h3>Gestión centralizada</h3>
+                    <p>Administra solicitudes, rutas, avisos y cuentas desde espacios protegidos por roles.</p>
+                </article>
+
+                <article class="feature-card-pro">
+                    <div class="feature-icon-pro">🔒</div>
+                    <h3>Acceso por roles</h3>
+                    <p>Autenticación con Spring Security, contraseñas almacenadas con BCrypt y opciones de inicio OIDC cuando se configuran.</p>
+                </article>
+
+                <article class="feature-card-pro">
+                    <div class="feature-icon-pro">📡</div>
+                    <h3>Monitoreo configurable</h3>
+                    <p>Comprueba periódicamente los destinos TCP definidos para el entorno y consulta canales de Windows Event Log habilitados para la cuenta del servicio.</p>
+                </article>
+            </div>
+        </section>
     </main>
+
+    <footer class="site-footer" style="margin-top: 50px;">
+        <span>LogiTrans Security &amp; Freight S.A.S. · Semestre V · TGRCSI</span>
+        <span>Tecnología en Gestión de Redes de Computadoras y Seguridad Informática</span>
+    </footer>
 </div>
 </body>
 </html>

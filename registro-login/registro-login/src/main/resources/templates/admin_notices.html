@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Avisos a clientes | LogiTrans Security & Freight</title>
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
+</head>
+<body class="admin-page">
+<div class="page-shell app-shell">
+    <header th:replace="~{fragments/admin-shell :: sidebar('notices')}"></header>
+    <main>
+        <section class="page-intro">
+            <p class="eyebrow">Comunicación con clientes</p>
+            <h1>Avisos y novedades</h1>
+            <p class="lead">Publica información clara sobre el servicio. Los avisos activos se muestran a los clientes en su panel.</p>
+        </section>
+        <div class="alert alert-success" role="status" th:if="${message}" th:text="${message}"></div>
+        <div class="alert alert-error" role="alert" th:if="${error}" th:text="${error}"></div>
+        <div class="alert alert-error" role="alert" th:if="${formError}" th:text="${formError}"></div>
+        <section class="content-section admin-columns notices-layout">
+            <div>
+                <div class="section-heading"><div><p class="eyebrow">Publicaciones</p><h2 th:text="|${#lists.size(notices)} avisos|">Avisos</h2></div></div>
+                <div class="notice-grid admin-notice-grid">
+                    <article class="notice-card admin-notice" th:each="notice : ${notices}">
+                        <div class="notice-card-top">
+                            <span class="notice-category" th:text="${notice.category}">Servicio</span>
+                            <form th:action="@{/admin/notices/{id}/delete(id=${notice.id})}" method="post" onsubmit="return confirm('¿Eliminar este aviso?')">
+                                <button class="text-button danger-text" type="submit">Eliminar</button>
+                            </form>
+                        </div>
+                        <h3 th:text="${notice.title}">Título</h3>
+                        <p th:text="${notice.body}">Detalle del aviso para clientes.</p>
+                    </article>
+                    <div class="empty-state" th:if="${#lists.isEmpty(notices)}">No hay avisos publicados. Puedes crear uno nuevo desde este espacio.</div>
+                </div>
+            </div>
+            <form class="form-card admin-form notice-form" th:action="@{/admin/notices}" th:object="${noticeForm}" method="post">
+                <p class="eyebrow">Nueva publicación</p><h2>Crear aviso</h2>
+                <p class="form-description">Escribe un mensaje directo y fácil de entender para las personas que usan la plataforma.</p>
+                <div class="form-group"><label for="notice-title">Título</label><input id="notice-title" th:field="*{title}" maxlength="100" required placeholder="Ej. Horarios especiales"></div>
+                <div class="form-group"><label for="notice-category">Categoría</label><input id="notice-category" th:field="*{category}" maxlength="40" required placeholder="Servicio, cobertura…"></div>
+                <div class="form-group"><label for="notice-body">Mensaje</label><textarea id="notice-body" th:field="*{body}" rows="5" maxlength="2000" required></textarea></div>
+                <button class="button primary" type="submit">Publicar aviso</button>
+            </form>
+        </section>
+    </main>
+    <footer th:replace="~{fragments/admin-shell :: footer}"></footer>
+</div>
+</body>
+</html>

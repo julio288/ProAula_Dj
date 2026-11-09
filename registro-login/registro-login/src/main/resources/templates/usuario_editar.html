@@ -3,42 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Editar usuario</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>Editar usuario | LogiTrans Security &amp; Freight</title>
+    <meta name="theme-color" content="#0d1117">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/user-edit.css}">
 </head>
-<body>
-<div class="page-shell auth-shell">
-    <div class="auth-card">
-        <div class="auth-header">
-            <p class="eyebrow">Administración</p>
-            <h1>Editar usuario</h1>
+<body class="admin-page edit-user-page">
+<div class="edit-user-shell">
+    <header class="edit-topbar">
+        <a class="brand" th:href="@{/users}" aria-label="Volver al directorio de usuarios">
+            <span class="brand-mark" aria-hidden="true">LT</span>
+            <span>LogiTrans <strong>Security &amp; Freight</strong></span>
+        </a>
+        <nav class="edit-breadcrumb" aria-label="Ruta de navegación">
+            <a th:href="@{/admin}">Administración</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/users}">Usuarios</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Editar perfil</span>
+        </nav>
+        <a class="edit-back-link" th:href="@{/users}">
+            <span aria-hidden="true">←</span> Directorio
+        </a>
+    </header>
+
+    <main class="edit-user-main">
+        <section class="edit-page-heading">
+            <div>
+                <p class="eyebrow">Gestión de cuentas <span class="edit-heading-divider">/</span> Perfil</p>
+                <h1>Editar usuario</h1>
+                <p>Actualiza la información de contacto asociada a esta cuenta.</p>
+            </div>
+            <span class="edit-record-chip"><span aria-hidden="true">ID</span> Registro <strong th:text="|#${userId}|">#01</strong></span>
+        </section>
+
+        <div class="edit-user-grid">
+            <aside class="edit-identity-card" aria-label="Resumen del usuario">
+                <div class="edit-identity-cover" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="edit-identity-content">
+                    <div class="edit-avatar" aria-hidden="true">
+                        <span data-profile-initials
+                              th:text="${(userForm.firstName != null and !#strings.isEmpty(userForm.firstName) ? #strings.substring(userForm.firstName, 0, 1) : 'U') + (userForm.lastName != null and !#strings.isEmpty(userForm.lastName) ? #strings.substring(userForm.lastName, 0, 1) : '')}">US</span>
+                        <i></i>
+                    </div>
+                    <span class="edit-account-label">CUENTA DE USUARIO</span>
+                    <h2 data-profile-name th:text="|${userForm.firstName} ${userForm.lastName}|">Nombre completo</h2>
+                    <p class="edit-profile-email" data-profile-email th:text="${userForm.email}">correo@logitrans.local</p>
+
+                    <div class="edit-identity-divider"></div>
+                    <div class="edit-detail-row">
+                        <span class="edit-detail-icon" aria-hidden="true">#</span>
+                        <span><small>Identificador</small><strong th:text="|USER-${userId}|">USER-01</strong></span>
+                    </div>
+                    <div class="edit-detail-row">
+                        <span class="edit-detail-icon edit-detail-icon-accent" aria-hidden="true">@</span>
+                        <span><small>Tipo de dato</small><strong>Información de contacto</strong></span>
+                    </div>
+
+                    <div class="edit-privacy-note">
+                        <span aria-hidden="true">i</span>
+                        <p>Los cambios se aplicarán a la información guardada en el perfil de esta cuenta.</p>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="edit-form-card" aria-labelledby="edit-form-title">
+                <div class="edit-form-heading">
+                    <div class="edit-form-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="edit-section-kicker">INFORMACIÓN PERSONAL</p>
+                        <h2 id="edit-form-title">Datos del perfil</h2>
+                        <p>Completa los campos para mantener el directorio actualizado.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-error edit-form-alert" role="alert" th:if="${formError}" th:text="${formError}"></div>
+
+                <form class="edit-user-form" th:action="@{/users/{id}/edit(id=${userId})}" th:object="${userForm}" method="post">
+                    <div class="edit-field">
+                        <label for="email">Correo electrónico <span>Requerido</span></label>
+                        <div class="edit-input-wrap">
+                            <span class="edit-input-icon" aria-hidden="true">@</span>
+                            <input id="email" type="email" th:field="*{email}" required maxlength="100"
+                                   class="edit-input" autocomplete="email" placeholder="nombre@empresa.com"
+                                   aria-describedby="email-hint">
+                        </div>
+                        <small class="edit-field-hint" id="email-hint">Se utilizará como dirección de contacto de la cuenta.</small>
+                        <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                    </div>
+
+                    <div class="edit-field-row">
+                        <div class="edit-field">
+                            <label for="firstName">Nombre <span>Requerido</span></label>
+                            <div class="edit-input-wrap">
+                                <span class="edit-input-icon" aria-hidden="true">01</span>
+                                <input id="firstName" type="text" th:field="*{firstName}" required minlength="2" maxlength="50"
+                                       class="edit-input" autocomplete="given-name" placeholder="Nombre">
+                            </div>
+                            <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                        </div>
+                        <div class="edit-field">
+                            <label for="lastName">Apellido <span>Requerido</span></label>
+                            <div class="edit-input-wrap">
+                                <span class="edit-input-icon" aria-hidden="true">02</span>
+                                <input id="lastName" type="text" th:field="*{lastName}" required minlength="2" maxlength="50"
+                                       class="edit-input" autocomplete="family-name" placeholder="Apellido">
+                            </div>
+                            <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+                        </div>
+                    </div>
+
+                    <div class="edit-form-footer">
+                        <p><span aria-hidden="true">↗</span> Revisa los datos antes de guardar.</p>
+                        <div class="edit-form-actions">
+                            <a class="edit-cancel-button" th:href="@{/users}">Cancelar</a>
+                            <button class="edit-save-button" type="submit">
+                                <span>Guardar cambios</span>
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
         </div>
+    </main>
 
-        <div class="alert alert-error" th:if="${formError}" th:text="${formError}"></div>
-
-        <form th:action="@{/users/{id}/edit(id=${userId})}"
-              th:object="${userForm}" method="post" class="auth-form">
-            <div class="form-group">
-                <label for="email">Correo electrónico</label>
-                <input id="email" type="email" th:field="*{email}" required maxlength="100">
-                <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-            </div>
-            <div class="form-group">
-                <label for="firstName">Nombre</label>
-                <input id="firstName" type="text" th:field="*{firstName}" required minlength="2" maxlength="50">
-                <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
-            </div>
-            <div class="form-group">
-                <label for="lastName">Apellido</label>
-                <input id="lastName" type="text" th:field="*{lastName}" required minlength="2" maxlength="50">
-                <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
-            </div>
-            <div class="button-row">
-                <button class="button primary" type="submit">Guardar cambios</button>
-                <a class="button secondary" th:href="@{/users}">Cancelar</a>
-            </div>
-        </form>
-    </div>
+    <footer class="edit-page-footer">
+        <span>LogiTrans <strong>Security &amp; Freight</strong></span>
+        <span>Administración de cuentas</span>
+    </footer>
 </div>
+<script th:src="@{/js/ui.js}" defer></script>
 </body>
 </html>

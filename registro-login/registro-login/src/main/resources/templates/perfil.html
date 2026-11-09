@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil autenticado | LogiTrans Security & Freight</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body class="auth-page">
+<main class="page-shell auth-shell">
+    <section class="stage">
+        <a class="brand stage-brand" th:href="@{/}">
+            <span class="brand-mark" aria-hidden="true">LT</span>
+            <span>LogiTrans <strong>Security &amp; Freight</strong></span>
+        </a>
+        <div class="stage-copy">
+            <p class="eyebrow">Identidad verificada</p>
+            <h2>Tu cuenta, protegida.</h2>
+            <p>Esta sesión fue autenticada mediante OpenID Connect.</p>
+        </div>
+    </section>
+    <section class="auth-card wide-card">
+        <a class="brand auth-brand" th:href="@{/}">
+            <span class="brand-mark" aria-hidden="true">LT</span>
+            <span>LogiTrans <strong>Security &amp; Freight</strong></span>
+        </a>
+        <div class="auth-header">
+            <p class="eyebrow">OpenID Connect</p>
+            <h1>Perfil autenticado</h1>
+            <p class="lead">Tu identidad fue validada por Google.</p>
+        </div>
+        <img th:if="${picture != null and !#strings.isEmpty(picture)}"
+             th:src="${picture}" alt="Foto de perfil" width="100" height="100">
+        <dl>
+            <dt>Nombre</dt>
+            <dd id="profile-name" th:text="${fullName}">Nombre</dd>
+            <dt>Correo</dt>
+            <dd id="profile-email" th:text="${email}">correo@ejemplo.com</dd>
+            <dt>Identificador OIDC (sub)</dt>
+            <dd id="profile-subject" th:text="${subject}">identificador</dd>
+        </dl>
+        <div class="button-row">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="button primary">Cerrar sesión</button>
+            </form>
+            <a class="button secondary" th:href="@{/}">Inicio</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

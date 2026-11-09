@@ -3,66 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>Mi espacio | LogiTrans Security & Freight</title>
+    <meta name="theme-color" content="#080d15">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/customer.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
 </head>
-<body>
-<div class="page-shell table-shell">
-    <div class="topbar">
-        <div class="user-greeting">
-            <span>Bienvenido,</span>
-            <strong th:text="${fullName}">Usuario</strong>
-        </div>
-        <form th:action="@{/logout}" method="post" class="logout-form">
-            <button type="submit" class="button secondary">Cerrar sesión</button>
-        </form>
-    </div>
+<body class="customer-page">
+<div class="page-shell app-shell">
+    <header class="top-header">
+        <a class="brand" th:href="@{/dashboard}">
+            <span class="brand-mark" aria-hidden="true">LT</span>
+            <span>LogiTrans <strong>Security &amp; Freight</strong></span>
+        </a>
+        <nav class="main-nav" aria-label="Navegación principal">
+            <a href="#rutas"><span class="nav-glyph"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6.5 8.5 4l7 2.5L21 4v13.5L15.5 20l-7-2.5L3 20V6.5Z"/><path d="M8.5 4v13.5m7-11V20"/></svg></span><span>Rutas</span></a>
+            <a href="#solicitud"><span class="nav-glyph"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h16v13H4z"/><path d="M8 7.5V5a4 4 0 0 1 8 0v2.5M8 12h8m-8 4h5"/></svg></span><span>Cotizar envío</span></a>
+            <a href="#historial"><span class="nav-glyph"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h11v10H4z"/><path d="M15 10h3.5l2 3V17H15z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M7 10h5m-5 3h3"/></svg></span><span>Seguimiento</span></a>
+            <a th:href="@{/profile}"><span class="nav-glyph"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0m-14 0h14"/></svg></span><span>Mi perfil</span></a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}"><span class="nav-glyph"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Administración</span></a>
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="button secondary button-compact">Salir</button>
+            </form>
+        </nav>
+    </header>
 
-    <div class="hero-card">
-        <div class="hero-copy">
-            <p class="eyebrow" sec:authorize="hasRole('ADMIN')">Administración</p>
-            <p class="eyebrow" sec:authorize="hasRole('USER')">Área personal</p>
-            <h1>Hola, <span th:text="${fullName}">Usuario</span>.</h1>
-            <p class="lead" sec:authorize="hasRole('ADMIN')">Administra las cuentas del sistema y mantén tus propios datos al día desde un solo lugar.</p>
-            <p class="lead" sec:authorize="hasRole('USER')">Consulta y actualiza tus datos personales y accede a las herramientas disponibles para tu cuenta.</p>
-            <div class="cta-row">
-                <a th:href="@{/profile}" class="button primary">Mi perfil</a>
-                <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" class="button secondary">Panel de administración</a>
-                <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="button secondary">Administrar usuarios</a>
+    <main>
+        <section class="hero-card customer-hero">
+            <div class="hero-copy">
+                <p class="eyebrow">PORTAL DE CLIENTES <span aria-hidden="true">/</span> LOGÍSTICA NACIONAL</p>
+                <h1>Hola, <span th:text="${fullName}">Usuario</span>.</h1>
+                <p class="lead">Todo lo que necesitas para enviar con confianza: descubre rutas, prepara una cotización y consulta las novedades de tu cuenta desde un solo lugar.</p>
+                <div class="cta-row">
+                    <a class="button primary" href="#solicitud"><span aria-hidden="true">＋</span> Crear cotización</a>
+                    <a class="button secondary" href="#rutas">Explorar rutas <span aria-hidden="true">→</span></a>
+                </div>
             </div>
+            <aside class="hero-aside network-panel" aria-label="Esquema ilustrativo de la red logística nacional">
+                <div class="network-panel-head">
+                    <span class="network-kicker"><i aria-hidden="true"></i> MAPA DE OPERACIONES</span>
+                    <span class="network-index">LT <b>/</b> CO-01</span>
+                </div>
+                <svg class="road-scene network-map" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                    <defs>
+                        <pattern id="map-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+                            <path d="M24 0H0V24" fill="none" stroke="#97b1c2" stroke-opacity=".09" stroke-width=".7"/>
+                            <circle cx="0" cy="0" r="1" fill="#9db5c4" fill-opacity=".2"/>
+                        </pattern>
+                        <linearGradient id="route-glow" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#c7f36b"/>
+                            <stop offset="1" stop-color="#54c8ff"/>
+                        </linearGradient>
+                        <radialGradient id="map-light" cx="210" cy="130" r="145" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#b9f568" stop-opacity=".09"/>
+                            <stop offset="1" stop-color="#b9f568" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <rect width="400" height="260" fill="url(#map-grid)"/>
+                    <circle cx="210" cy="130" r="145" fill="url(#map-light)"/>
+                    <path class="map-contour" d="M-20 177C52 153 38 92 103 83s71 41 125 15 79-74 191-45M-20 205c65-26 72-77 130-75s79 50 131 25 86-65 181-39M-26 115c60-16 70-68 139-57s86 52 146 18 95-35 161-11" fill="none" stroke="#84a5b5" stroke-opacity=".11"/>
+                    <path class="network-route network-route-muted" d="M48 174C94 148 105 91 166 82s88 54 130 34 37-52 72-58" fill="none"/>
+                    <path class="network-route network-route-muted" d="M48 174c61 9 73 42 129 28s68-33 119-14 48 34 72 46" fill="none"/>
+                    <path class="network-route network-route-main" d="M48 174C94 148 105 91 166 82s88 54 130 34 37-52 72-58"/>
+                    <path class="network-route network-route-branch" d="M166 82c9 46 1 77 11 120m-11-120c48-3 83 11 130 34"/>
+                    <circle class="map-node map-node-hub" cx="166" cy="82" r="13"/>
+                    <circle class="map-node map-node-hub" cx="297" cy="116" r="10"/>
+                    <circle class="map-node" cx="48" cy="174" r="7"/>
+                    <circle class="map-node" cx="368" cy="58" r="7"/>
+                    <circle class="map-node" cx="296" cy="188" r="7"/>
+                    <circle class="map-node" cx="177" cy="202" r="7"/>
+                    <circle class="map-pulse" cx="166" cy="82" r="22"/>
+                    <g class="map-tag" transform="translate(183 64)">
+                        <rect width="72" height="23" rx="6"/>
+                        <text x="10" y="15">NODO 01</text>
+                    </g>
+                    <g class="map-tag map-tag-secondary" transform="translate(306 102)">
+                        <rect width="65" height="21" rx="6"/>
+                        <text x="9" y="14">NODO 02</text>
+                    </g>
+                    <path d="M344 205v-22m0 0-5 7m5-7 5 7" class="map-north"/>
+                    <text class="map-north-label" x="340" y="218">N</text>
+                </svg>
+                <div class="network-panel-foot">
+                    <span class="network-count"><strong th:text="${#lists.size(lanes)}">6</strong><span>RUTAS<br>DISPONIBLES</span></span>
+                    <span class="network-foot-divider" aria-hidden="true"></span>
+                    <span class="network-foot-copy">Una red diseñada<br>para llegar más lejos.</span>
+                    <span class="network-live"><i aria-hidden="true"></i> COLOMBIA</span>
+                </div>
+            </aside>
+        </section>
+
+        <div class="metrics-grid" aria-label="Resumen de tu cuenta">
+            <article class="metric-card">
+                <span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.3 7.6 7.7 4.3 7.7-4.3M12 12v9M8 5.3l8 4.4"/></svg></span>
+                <span class="metric-label">ACTIVIDAD DE CUENTA</span>
+                <strong th:text="${#lists.size(customerRequests)}">0</strong>
+                <small>Envíos registrados en tu cuenta</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.5 9h17M3.5 15h17M12 3c2.4 2.5 3.5 5.5 3.5 9s-1.1 6.5-3.5 9c-2.4-2.5-3.5-5.5-3.5-9S9.6 5.5 12 3Z"/></svg></span>
+                <span class="metric-label">COBERTURA ACTIVA</span>
+                <strong th:text="${#lists.size(lanes)}">0</strong>
+                <small>Trayectos habilitados para carga</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1M4 13h3v6H6a2 2 0 0 1-2-2v-4Zm16 0h-3v6h1a2 2 0 0 0 2-2v-4ZM17 19a5 5 0 0 1-5 2"/></svg></span>
+                <span class="metric-label">CENTRO DE AYUDA</span>
+                <strong>Disponible</strong>
+                <small>Consulta las novedades del servicio</small>
+            </article>
         </div>
 
-        <div class="feature-panel">
-            <div class="feature-item">
-                <span class="feature-icon">01</span>
-                <div>
-                    <strong>Tu cuenta</strong>
-                    <small>Actualiza tu nombre y correo</small>
+        <div class="content-grid">
+            <section id="rutas" class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">DESTINOS DISPONIBLES</p>
+                        <h2>Rutas de carga</h2>
+                    </div>
+                    <span class="section-caption">Tarifas de referencia en COP</span>
                 </div>
-            </div>
-            <div class="feature-item">
-                    <span class="feature-icon">02</span>
-                <div>
-                    <strong>Acceso protegido</strong>
-                    <small>Las funciones dependen de tu rol</small>
+                <div class="route-grid">
+                    <article class="route-card" th:each="lane : ${lanes}">
+                        <div class="route-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg></div>
+                        <div class="route-line">
+                                    <span th:text="${lane.origin}">Bogotá</span>
+                                    <span class="route-arrow" aria-hidden="true">→</span>
+                                    <span th:text="${lane.destination}">Medellín</span>
+                        </div>
+                                <p class="route-schedule" th:text="${lane.schedule}">Lun-Sáb · 06:00</p>
+                        <div class="route-meta">
+                                    <span><strong th:text="${lane.transitDays}">2</strong> días aprox.</span>
+                            <span><strong th:text="|$ ${#numbers.formatDecimal(lane.pricePerKg, 1, 'POINT', 0, 'COMMA')} COP/kg|">$ 1.850 COP/kg</strong></span>
+                        </div>
+                        <p class="route-minimum">Tarifa mínima: <span th:text="|$ ${#numbers.formatDecimal(lane.minimumPrice, 1, 'POINT', 0, 'COMMA')} COP|">$ 18.000 COP</span></p>
+                        <a class="text-link" href="#solicitud">Cotizar esta ruta <span aria-hidden="true">→</span></a>
+                    </article>
+                    <div class="empty-state" th:if="${#lists.isEmpty(lanes)}">
+                        <strong>Estamos actualizando nuestras rutas.</strong>
+                        <p>Vuelve pronto para consultar disponibilidad.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-item" sec:authorize="hasRole('ADMIN')">
-                <span class="feature-icon">03</span>
-                <div>
-                    <strong>Herramientas de administración</strong>
-                    <small>Consulta, edita y elimina cuentas</small>
+            </section>
+
+            <aside class="notice-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">ACTUALIZACIONES DEL SERVICIO</p>
+                        <h2>Novedades</h2>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-item" sec:authorize="hasRole('USER')">
-                <span class="feature-icon">03</span>
-                <div>
-                    <strong>Área personal</strong>
-                    <small>Solo tú puedes modificar tu perfil</small>
-                </div>
-            </div>
+                <article class="notice-card" th:each="notice : ${notices}">
+                    <span class="notice-category" th:text="${notice.category}">Servicio</span>
+                    <h3 th:text="${notice.title}">Seguimiento en línea</h3>
+                    <p th:text="${notice.body}">Novedad de la operación.</p>
+                </article>
+                <div class="empty-state compact" th:if="${#lists.isEmpty(notices)}">No hay avisos nuevos.</div>
+            </aside>
         </div>
-    </div>
+
+        <section id="solicitud" class="content-section request-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">NUEVA SOLICITUD</p>
+                    <h2>Prepara tu cotización</h2>
+                    <p class="section-caption">El valor estimado se calcula con el peso y la tarifa de la ruta elegida.</p>
+                </div>
+            </div>
+            <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
+            <div class="alert alert-error" th:if="${requestError}" th:text="${requestError}"></div>
+            <form th:action="@{/shipments}" th:object="${freightRequestForm}" method="post" class="form-card grid-form">
+                <div class="form-group">
+                    <label for="laneId">Ruta disponible</label>
+                    <select id="laneId" th:field="*{laneId}" required>
+                        <option value="">Selecciona origen y destino</option>
+                        <option th:each="lane : ${lanes}" th:value="${lane.id}"
+                                th:text="|${lane.origin} → ${lane.destination} · $${lane.pricePerKg}/kg COP|">Bogotá → Medellín</option>
+                    </select>
+                    <span class="field-error" th:if="${#fields.hasErrors('laneId')}" th:errors="*{laneId}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="weightKg">Peso aproximado (kg)</label>
+                    <input id="weightKg" type="number" th:field="*{weightKg}" min="0.10" step="0.01" required placeholder="Ej. 25">
+                    <span class="field-error" th:if="${#fields.hasErrors('weightKg')}" th:errors="*{weightKg}"></span>
+                </div>
+                <div class="form-group full-width">
+                    <label for="cargoDescription">¿Qué vas a enviar?</label>
+                    <input id="cargoDescription" type="text" th:field="*{cargoDescription}" maxlength="240" required placeholder="Describe brevemente la mercancía">
+                    <span class="field-error" th:if="${#fields.hasErrors('cargoDescription')}" th:errors="*{cargoDescription}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="recipientName">Nombre de quien recibe</label>
+                    <input id="recipientName" type="text" th:field="*{recipientName}" maxlength="100" required autocomplete="name">
+                    <span class="field-error" th:if="${#fields.hasErrors('recipientName')}" th:errors="*{recipientName}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="recipientPhone">Teléfono de contacto</label>
+                    <input id="recipientPhone" type="tel" th:field="*{recipientPhone}" maxlength="30" required autocomplete="tel">
+                    <span class="field-error" th:if="${#fields.hasErrors('recipientPhone')}" th:errors="*{recipientPhone}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="originAddress">Dirección de recogida</label>
+                    <input id="originAddress" type="text" th:field="*{originAddress}" maxlength="180" required autocomplete="street-address">
+                    <span class="field-error" th:if="${#fields.hasErrors('originAddress')}" th:errors="*{originAddress}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="destinationAddress">Dirección de entrega</label>
+                    <input id="destinationAddress" type="text" th:field="*{destinationAddress}" maxlength="180" required>
+                    <span class="field-error" th:if="${#fields.hasErrors('destinationAddress')}" th:errors="*{destinationAddress}"></span>
+                </div>
+                <div class="form-actions full-width">
+                    <p>La tarifa es estimada y se confirma al revisar la solicitud.</p>
+                    <button class="button primary" type="submit">Crear solicitud <span aria-hidden="true">→</span></button>
+                </div>
+            </form>
+        </section>
+
+        <section id="historial" class="content-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">TU ACTIVIDAD</p>
+                    <h2>Seguimiento de envíos</h2>
+                </div>
+                <span class="section-caption">Solo tú puedes consultar tus solicitudes</span>
+            </div>
+            <div class="shipment-list" th:if="${!#lists.isEmpty(customerRequests)}">
+                <article class="shipment-card" th:each="request : ${customerRequests}">
+                    <div class="shipment-heading">
+                        <div>
+                            <span class="tracking-code" th:text="${request.trackingCode}">CO-ABC123</span>
+                            <h3 th:text="|${request.lane.origin} → ${request.lane.destination}|">Bogotá → Medellín</h3>
+                        </div>
+                        <span class="status-pill"
+                              th:classappend="${#strings.toLowerCase(#strings.replace(request.status.name(), '_', '-'))}"
+                              th:text="${request.status.label}">Recibida</span>
+                    </div>
+                    <div class="shipment-details">
+                        <span><small>Mercancía</small><strong th:text="${request.cargoDescription}">Carga</strong></span>
+                        <span><small>Peso</small><strong th:text="|${request.weightKg} kg|">25 kg</strong></span>
+                        <span><small>Valor estimado</small><strong th:text="|$ ${#numbers.formatDecimal(request.estimatedPrice, 1, 'POINT', 0, 'COMMA')} COP|">$ 45.000 COP</strong></span>
+                        <span><small>Fecha</small><strong th:text="${#temporals.format(request.createdAt, 'dd/MM/yyyy')}">01/01/2026</strong></span>
+                    </div>
+                    <div class="track" aria-label="Progreso del envío"><span>Recibida</span><span>Cotizada</span><span>En tránsito</span><span>Entregada</span></div>
+                </article>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(customerRequests)}">
+                <span class="empty-icon" aria-hidden="true">📭</span>
+                <strong>Aún no tienes envíos registrados.</strong>
+                <p>Cuando crees una solicitud, aquí podrás revisar su estado y seguimiento.</p>
+                <a class="text-link" href="#solicitud">Crear mi primer envío →</a>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer"><span>LogiTrans Security & Freight</span><span>Prototipo académico · Tarifas ficticias en COP</span></footer>
 </div>
 </body>
 </html>

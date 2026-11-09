@@ -1,6 +1,7 @@
 package com.taller.registro_login.service;
 
 import com.taller.registro_login.model.User;
+import com.taller.registro_login.repository.FreightRequestRepository;
 import com.taller.registro_login.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,12 +14,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 class UserServiceTests {
 
     private final UserRepository userRepository = mock(UserRepository.class);
+    private final FreightRequestRepository freightRequestRepository = mock(FreightRequestRepository.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-    private final UserService userService = new UserService(userRepository, passwordEncoder, "admin2027");
+    private final UserService userService = new UserService(
+            userRepository, freightRequestRepository, passwordEncoder, "admin2027");
 
     @Test
     void publicRegistrationAlwaysAssignsUserRoleAndEncodesPassword() {
@@ -58,13 +63,61 @@ class UserServiceTests {
 
     @Test
     void adminRegistrationRejectsRequestsWhenNoCodeIsConfigured() {
-        UserService serviceWithoutCode = new UserService(userRepository, passwordEncoder, "");
+        UserService serviceWithoutCode = new UserService(
+                userRepository, freightRequestRepository, passwordEncoder, "");
         User user = user("admin@example.test", "plain-password");
 
         assertThatThrownBy(() -> serviceWithoutCode.registerAdmin(user, "any-code"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("El código de administrador no es válido.");
         verify(userRepository, never()).save(org.mockito.ArgumentMatchers.any(User.class));
+    }
+
+    @Test
+    void createsCustomerAccountForFirstVerifiedGoogleLogin() {
+        when(userRepository.findByEmail("google@example.test")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("unusable-encoded-password");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User saved = invocation.getArgument(0);
+            saved.setId(42L);
+            return saved;
+        });
+
+        User account = userService.findOrCreateGoogleUser(
+                " Google@Example.Test ", "  Ada   Lovelace  ");
+
+        assertThat(account.getId()).isEqualTo(42L);
+        assertThat(account.getEmail()).isEqualTo("google@example.test");
+        assertThat(account.getFirstName()).isEqualTo("Ada");
+        assertThat(account.getLastName()).isEqualTo("Lovelace");
+        assertThat(account.getRole()).isEqualTo(User.ROLE_USER);
+        assertThat(account.getPassword()).isEqualTo("unusable-encoded-password");
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void googleLoginReusesExistingAccountWithoutChangingItsRoleOrPassword() {
+        User existing = user("owner@example.test", "existing-encoded-password");
+        existing.setId(8L);
+        existing.setRole(User.ROLE_ADMIN);
+        when(userRepository.findByEmail("owner@example.test")).thenReturn(Optional.of(existing));
+
+        User account = userService.findOrCreateGoogleUser(
+                "OWNER@example.test", "Nombre distinto");
+
+        assertThat(account).isSameAs(existing);
+        assertThat(account.getRole()).isEqualTo(User.ROLE_ADMIN);
+        assertThat(account.getPassword()).isEqualTo("existing-encoded-password");
+        verify(userRepository, never()).save(any(User.class));
+        verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    void refusesGoogleAccountsWithoutAValidEmail() {
+        assertThatThrownBy(() -> userService.findOrCreateGoogleUser(" ", "Cuenta sin correo"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("correo válido");
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -108,6 +161,18 @@ class UserServiceTests {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("último administrador");
         verify(userRepository, never()).delete(admin);
+    }
+
+    @Test
+    void deletesCustomerRequestsWhenAnAccountIsRemoved() {
+        User customer = user("customer@example.test", "encoded-password");
+        customer.setId(2L);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(customer));
+
+        userService.deleteUser(2L, 1L);
+
+        verify(freightRequestRepository).deleteByCustomerId(2L);
+        verify(userRepository).delete(customer);
     }
 
     private User user(String email, String password) {

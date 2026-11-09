@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reportes | LogiTrans Security & Freight</title>
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
+</head>
+<body class="admin-page">
+<div class="page-shell app-shell">
+    <header th:replace="~{fragments/admin-shell :: sidebar('reports')}"></header>
+    <main>
+        <section class="page-intro report-intro">
+            <p class="eyebrow">Analítica de la plataforma</p>
+            <h1>Reportes de actividad</h1>
+            <p class="lead">Una lectura visual de solicitudes, cobertura y uso del servicio, basada en los datos registrados.</p>
+            <span class="report-period"><span aria-hidden="true">◷</span> Tendencia: últimos 6 meses · actualización al cargar</span>
+        </section>
+
+        <section class="report-kpi-grid" aria-label="Indicadores principales">
+            <article class="report-kpi">
+                <span class="report-kpi-label">Solicitudes registradas</span>
+                <strong th:text="${report.totalRequests}">0</strong>
+                <small>En toda la plataforma</small>
+                <span class="report-kpi-icon" aria-hidden="true">↗</span>
+            </article>
+            <article class="report-kpi">
+                <span class="report-kpi-label">Entregas completadas</span>
+                <strong th:text="${report.completionRateLabel}">0,0%</strong>
+                <small th:text="|${report.completedRequests} entregas de ${report.totalRequests} solicitudes|">0 entregas</small>
+                <span class="report-kpi-icon" aria-hidden="true">✓</span>
+            </article>
+            <article class="report-kpi">
+                <span class="report-kpi-label">Valor cotizado estimado</span>
+                <strong class="report-kpi-money" th:text="|$ ${report.estimatedShipmentValueLabel}|">$ 0</strong>
+                <small>COP · no representa ingresos confirmados</small>
+                <span class="report-kpi-icon" aria-hidden="true">$</span>
+            </article>
+            <article class="report-kpi">
+                <span class="report-kpi-label">Carga gestionada</span>
+                <strong class="report-kpi-money" th:text="|${report.totalWeightKgLabel} kg|">0 kg</strong>
+                <small th:text="|Promedio cotizado: $ ${report.averageEstimatedValueLabel} COP|">Peso total de solicitudes</small>
+                <span class="report-kpi-icon" aria-hidden="true">⌁</span>
+            </article>
+        </section>
+
+        <section class="report-chart-grid" aria-label="Gráficos de actividad">
+            <article class="report-chart-card report-trend-card">
+                <div class="report-chart-header">
+                    <div><p class="eyebrow">Evolución</p><h2>Solicitudes por mes</h2><p>Volumen mensual de solicitudes creadas</p></div>
+                    <span class="report-chip" th:text="${report.comparisonLabel}">Últimos seis meses</span>
+                </div>
+                <div class="trend-chart">
+                    <svg viewBox="0 0 600 250" role="img" aria-labelledby="trend-title trend-desc" preserveAspectRatio="xMidYMid meet">
+                        <title id="trend-title">Tendencia mensual de solicitudes</title>
+                        <desc id="trend-desc">Gráfico de líneas que compara las solicitudes creadas en cada uno de los últimos seis meses.</desc>
+                        <line class="trend-gridline" x1="42" y1="35" x2="568" y2="35"></line>
+                        <line class="trend-gridline" x1="42" y1="102" x2="568" y2="102"></line>
+                        <line class="trend-gridline" x1="42" y1="170" x2="568" y2="170"></line>
+                        <text class="trend-axis-label" x="30" y="39" text-anchor="end" th:text="${report.trendAxisMaximum}">0</text>
+                        <text class="trend-axis-label" x="30" y="106" text-anchor="end" th:text="${report.trendAxisMidpoint}">0</text>
+                        <text class="trend-axis-label" x="30" y="174" text-anchor="end">0</text>
+                        <polyline class="trend-line" th:attr="points=${report.trendPolyline}"></polyline>
+                        <g th:each="point : ${report.monthlyTrend}">
+                            <circle class="trend-point" th:attr="cx=${point.x},cy=${point.y},aria-label=|${point.label}: ${point.value} solicitudes|" r="5"></circle>
+                            <text class="trend-value" th:attr="x=${point.x},y=${point.y - 13}" text-anchor="middle" th:text="${point.value}">0</text>
+                            <text class="trend-month" th:attr="x=${point.x},y=208" text-anchor="middle" th:text="${point.label}">Mes</text>
+                        </g>
+                    </svg>
+                </div>
+                <div class="chart-footnote"><span class="chart-legend-dot trend-dot"></span> Solicitudes nuevas <span class="chart-footnote-note">Comparación contra el mes anterior</span></div>
+            </article>
+
+            <article class="report-chart-card">
+                <div class="report-chart-header">
+                    <div><p class="eyebrow">Estado actual</p><h2>Flujo de solicitudes</h2><p>Distribución por etapa de atención</p></div>
+                </div>
+                <div class="status-chart-layout">
+                    <div class="status-donut" role="img"
+                         th:attr="aria-label=|Distribución de ${report.totalRequests} solicitudes por estado|"
+                         th:style="|--donut-chart: ${report.statusDonutBackground}|">
+                        <div class="status-donut-center"><strong th:text="${report.totalRequests}">0</strong><span>solicitudes</span></div>
+                    </div>
+                    <ul class="status-legend">
+                        <li th:each="item : ${report.statusBreakdown}">
+                            <span class="status-legend-label"><i th:style="|--legend-color: ${item.color}|"></i><span th:text="${item.label}">Estado</span></span>
+                            <strong th:text="${item.value}">0</strong>
+                            <small th:text="${item.percentageLabel}">0%</small>
+                        </li>
+                    </ul>
+                </div>
+                <p class="report-card-note">Cada porcentaje se calcula sobre el total de solicitudes registradas.</p>
+            </article>
+
+            <article class="report-chart-card">
+                <div class="report-chart-header">
+                    <div><p class="eyebrow">Cobertura</p><h2>Rutas más utilizadas</h2><p>Solicitudes agrupadas por trayecto</p></div>
+                    <a class="report-card-link" th:href="@{/admin/routes}">Gestionar rutas <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="ranking-chart" th:if="${!#lists.isEmpty(report.topRoutes)}">
+                    <div class="ranking-row" th:each="item,iter : ${report.topRoutes}" th:style="|--rank-delay: ${iter.index * 70}ms|">
+                        <div class="ranking-label"><strong th:text="${item.label}">Origen → destino</strong><span th:text="${item.value}">0</span></div>
+                        <div class="ranking-track" role="img" th:attr="aria-label=|${item.label}: ${item.value} solicitudes|">
+                            <span th:style="|--bar-width: ${item.relativeWidth}%; --rank-color: ${iter.index == 0 ? '#7280ff' : (iter.index == 1 ? '#22d3ee' : '#a78bfa')}|"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="report-empty-chart" th:if="${#lists.isEmpty(report.topRoutes)}">Cuando se creen solicitudes, aquí verás qué trayectos tienen más demanda.</div>
+                <p class="report-card-note">Se muestran hasta 5 rutas; las barras comparan su volumen con la ruta de mayor actividad.</p>
+            </article>
+
+            <article class="report-chart-card">
+                <div class="report-chart-header">
+                    <div><p class="eyebrow">Uso del servicio</p><h2>Clientes con más solicitudes</h2><p>Actividad registrada por cuenta cliente</p></div>
+                    <a class="report-card-link" th:href="@{/users}">Ver usuarios <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="ranking-chart customer-ranking" th:if="${!#lists.isEmpty(report.topCustomers)}">
+                    <div class="ranking-row" th:each="item,iter : ${report.topCustomers}" th:style="|--rank-delay: ${iter.index * 70}ms|">
+                        <div class="ranking-label"><strong th:text="${item.label}">Nombre de cliente</strong><span th:text="${item.value}">0</span></div>
+                        <div class="ranking-track" role="img" th:attr="aria-label=|${item.label}: ${item.value} solicitudes|">
+                            <span th:style="|--bar-width: ${item.relativeWidth}%; --rank-color: ${iter.index == 0 ? '#22d3ee' : (iter.index == 1 ? '#4ade80' : '#7280ff')}|"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="report-empty-chart" th:if="${#lists.isEmpty(report.topCustomers)}">Aún no hay solicitudes asociadas a clientes.</div>
+                <p class="report-card-note">Este gráfico refleja uso del servicio, no desempeño laboral individual.</p>
+            </article>
+        </section>
+
+        <section class="report-insight">
+            <span class="report-insight-icon" aria-hidden="true">i</span>
+            <div>
+                <h2>Cómo interpretar estos indicadores</h2>
+                <p>La tendencia usa los últimos seis meses calendario. El valor cotizado y el peso provienen de las solicitudes; son cifras estimadas y no equivalen a ingresos ni a carga efectivamente entregada. La tasa de entrega es la proporción de solicitudes marcadas como entregadas sobre el total.</p>
+                <p>La aplicación todavía no registra qué trabajador atendió cada solicitud ni el historial de cambios por persona. Por ello, estos reportes describen la operación y la actividad de clientes, sin atribuir resultados a empleados.</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading"><div><p class="eyebrow">Recursos publicados</p><h2>Contenido del servicio</h2></div></div>
+            <div class="report-resource-grid">
+                <a class="report-resource" th:href="@{/admin/routes}"><span class="quick-icon">⌁</span><span><strong th:text="${laneCount}">0</strong><small>Rutas configuradas</small></span><b aria-hidden="true">→</b></a>
+                <a class="report-resource" th:href="@{/admin/notices}"><span class="quick-icon">◉</span><span><strong th:text="${noticeCount}">0</strong><small>Avisos publicados</small></span><b aria-hidden="true">→</b></a>
+                <a class="report-resource" th:href="@{/admin/shipments}"><span class="quick-icon">↗</span><span><strong th:text="${openRequestCount}">0</strong><small>Solicitudes por atender</small></span><b aria-hidden="true">→</b></a>
+            </div>
+        </section>
+    </main>
+    <footer th:replace="~{fragments/admin-shell :: footer}"></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="top-header" th:fragment="sidebar(active)">
+    <a class="brand" th:href="@{/admin}">
+        <span class="brand-mark" aria-hidden="true">LT</span>
+        <span>LogiTrans <strong>Security &amp; Freight</strong></span>
+    </a>
+    <nav class="main-nav" aria-label="Navegación de administración">
+        <a th:href="@{/admin}" th:attr="aria-current=${active == 'overview' ? 'page' : null}">Resumen</a>
+        <a th:href="@{/admin/monitoring}" th:attr="aria-current=${active == 'monitoring' ? 'page' : null}">Monitoreo LAN</a>
+        <a th:href="@{/admin/shipments}" th:attr="aria-current=${active == 'shipments' ? 'page' : null}">Envíos</a>
+        <a th:href="@{/admin/routes}" th:attr="aria-current=${active == 'routes' ? 'page' : null}">Rutas y tarifas</a>
+        <a th:href="@{/admin/notices}" th:attr="aria-current=${active == 'notices' ? 'page' : null}">Avisos</a>
+        <a th:href="@{/users}" th:attr="aria-current=${active == 'users' ? 'page' : null}">Usuarios</a>
+        <a th:href="@{/admin/reports}" th:attr="aria-current=${active == 'reports' ? 'page' : null}">Reportes</a>
+        <a th:href="@{/dashboard}">Vista cliente</a>
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="button secondary button-compact">Cerrar sesión</button>
+        </form>
+    </nav>
+</header>
+<footer class="site-footer" th:fragment="footer">
+    <span>LogiTrans Security &amp; Freight S.A.S. · Administrador de Red y Servicios</span>
+    <span>Consola de Monitoreo e Infraestructura Tecnológica</span>
+</footer>
+</body>
+</html>

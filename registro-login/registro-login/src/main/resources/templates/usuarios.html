@@ -1,69 +1,468 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Usuarios</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title>Directorio de Cuentas &amp; RBAC | LogiTrans Security &amp; Freight S.A.S.</title>
+    <meta name="theme-color" content="#070a10">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script th:src="@{/js/ui.js}" defer></script>
+    <style>
+        :root {
+            --user-bg: #070a10;
+            --user-card: #0d121c;
+            --user-border: rgba(255, 255, 255, 0.08);
+            --user-cyan: #06b6d4;
+            --user-purple: #8b5cf6;
+            --user-green: #10b981;
+            --user-rose: #f43f5e;
+        }
+
+        body.users-page {
+            font-family: 'Inter', -apple-system, sans-serif !important;
+            background-color: var(--user-bg) !important;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.07) 0px, transparent 50%) !important;
+        }
+
+        /* Hero Avanzado */
+        .users-hero-card {
+            background: linear-gradient(135deg, rgba(20, 27, 43, 0.95), rgba(11, 15, 25, 0.98));
+            border: 1px solid var(--user-border);
+            border-radius: 18px;
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .users-hero-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: 0;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+        .users-hero-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            margin: 4px 0 10px;
+        }
+        .users-hero-title span {
+            background: linear-gradient(135deg, #a78bfa, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Malla de KPIs Rápidos */
+        .rbac-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .rbac-kpi-card {
+            background: var(--user-card);
+            border: 1px solid var(--user-border);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.25s ease;
+        }
+        .rbac-kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(139, 92, 246, 0.35);
+            box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.5);
+        }
+        .rbac-kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 1.4rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+        .rbac-kpi-info h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin: 0 0 4px;
+            font-weight: 600;
+        }
+        .rbac-kpi-info strong {
+            font-size: 1.6rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: #ffffff;
+        }
+
+        /* Buscador e Interacción */
+        .directory-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .user-search-box {
+            position: relative;
+            min-width: 280px;
+            flex: 1;
+            max-width: 420px;
+        }
+        .user-search-input {
+            width: 100%;
+            background: rgba(13, 18, 28, 0.9) !important;
+            border: 1px solid var(--user-border) !important;
+            border-radius: 10px !important;
+            padding: 10px 16px 10px 38px !important;
+            color: #f8fafc !important;
+            font-size: 0.88rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .user-search-input:focus {
+            border-color: var(--user-purple) !important;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+        }
+        .search-icon-svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        /* Tabla de Cuentas Premium */
+        .users-table-card {
+            background: var(--user-card);
+            border: 1px solid var(--user-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            margin-bottom: 30px;
+        }
+        .pro-users-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .pro-users-table th {
+            padding: 16px 22px;
+            background: rgba(9, 13, 20, 0.85);
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--user-border);
+        }
+        .pro-users-table td {
+            padding: 16px 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+            vertical-align: middle;
+        }
+        .pro-users-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        .pro-users-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        /* Avatar del Usuario */
+        .user-profile-cell {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: #ffffff;
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+        .user-avatar.admin-avatar {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.35);
+        }
+        .user-name-title {
+            font-weight: 700;
+            color: #f8fafc;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.95rem;
+        }
+        .user-email-subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* Insignia de Roles */
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .role-admin {
+            background: rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.15);
+        }
+        .role-user {
+            background: rgba(6, 182, 212, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(6, 182, 212, 0.25);
+        }
+        .role-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Botones de Acción */
+        .action-btns-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-action-edit {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            color: #e2e8f0 !important;
+            border-radius: 8px !important;
+            padding: 6px 14px !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-action-edit:hover {
+            background: rgba(255, 255, 255, 0.12) !important;
+            border-color: #cbd5e1 !important;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+        }
+        .btn-action-del {
+            background: rgba(244, 63, 94, 0.1) !important;
+            border: 1px solid rgba(244, 63, 94, 0.25) !important;
+            color: #fb7185 !important;
+            border-radius: 8px !important;
+            padding: 6px 14px !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-action-del:hover {
+            background: rgba(244, 63, 94, 0.2) !important;
+            border-color: #f43f5e !important;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+        }
+        .current-user-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+    </style>
 </head>
-<body>
-<div class="page-shell table-shell">
-    <div class="topbar">
-        <div class="user-greeting">
-            <span>Bienvenido,</span>
-            <strong sec:authentication="principal.fullName">Usuario</strong>
-        </div>
-        <form th:action="@{/logout}" method="post" class="logout-form">
-            <button type="submit" class="button secondary">Cerrar sesión</button>
-        </form>
-    </div>
+<body class="admin-page users-page">
+<div class="page-shell app-shell">
+    <header th:replace="~{fragments/admin-shell :: sidebar('users')}"></header>
 
-    <div class="table-card">
-        <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
-        <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
-        <div class="section-heading">
+    <main>
+        <!-- Banner Principal Hero -->
+        <section class="users-hero-card">
             <div>
-                <p class="eyebrow">Panel</p>
-                <h1>Usuarios del sistema</h1>
+                <p class="eyebrow" style="color: #a78bfa; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">SECURITY ACCESS CONTROL &amp; RBAC DIRECTORY</p>
+                <h1 class="users-hero-title">Gestión de Cuentas &amp; <span>Accesos</span></h1>
+                <p style="color: #94a3b8; max-width: 620px; font-size: 0.92rem; line-height: 1.6;">Control centralizado de identidades, privilegios y roles de acceso para el personal operativo y clientes en la red corporativa de LogiTrans.</p>
+                <div class="cta-row" style="margin-top: 20px;">
+                    <a class="button primary" th:href="@{/register}" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); border: none; box-shadow: 0 10px 24px -6px rgba(139, 92, 246, 0.4);">
+                        <span>＋</span> Registrar Nueva Cuenta
+                    </a>
+                    <a class="button secondary" th:href="@{/admin}" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); color: #fff;">
+                        Volver a Centro de Operaciones
+                    </a>
+                </div>
             </div>
-            <a class="button primary" th:href="@{/register}">Nuevo usuario</a>
+            <aside class="hero-aside admin-aside" style="background: rgba(13, 18, 28, 0.7); border: 1px solid var(--user-border); border-radius: 16px; padding: 22px 26px;">
+                <span class="live" style="color: #c084fc; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;"><i></i>POLÍTICA RBAC ACTIVA</span>
+                <div style="font-size: 2.2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff; margin: 10px 0 4px;" th:text="${#lists.size(listUsers)}">0</div>
+                <span class="demo-note" style="color: #94a3b8; font-size: 0.8rem;">Cuentas totales dadas de alta</span>
+            </aside>
+        </section>
+
+        <!-- Malla de Indicadores RBAC -->
+        <section class="rbac-kpi-grid">
+            <article class="rbac-kpi-card">
+                <div class="rbac-kpi-icon" style="color: #38bdf8;">👥</div>
+                <div class="rbac-kpi-info">
+                    <h4>Total Cuentas</h4>
+                    <strong th:text="${#lists.size(listUsers)}">0</strong>
+                </div>
+            </article>
+
+            <article class="rbac-kpi-card">
+                <div class="rbac-kpi-icon" style="color: #c084fc;">🛡️</div>
+                <div class="rbac-kpi-info">
+                    <h4>Administradores</h4>
+                    <strong>ROLE_ADMIN</strong>
+                </div>
+            </article>
+
+            <article class="rbac-kpi-card">
+                <div class="rbac-kpi-icon" style="color: #34d399;">🔒</div>
+                <div class="rbac-kpi-info">
+                    <h4>Almacenamiento Claves</h4>
+                    <strong style="font-size: 1.15rem; color: #34d399;">BCRYPT HASH</strong>
+                </div>
+            </article>
+        </section>
+
+        <!-- Mensajes Flash -->
+        <div class="alert alert-success" role="status" th:if="${message}" th:text="${message}" style="border-radius: 12px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #6ee7b7;"></div>
+        <div class="alert alert-error" role="alert" th:if="${error}" th:text="${error}" style="border-radius: 12px;"></div>
+
+        <!-- Barra de Búsqueda y Filtro Rápido en Vivo -->
+        <div class="directory-toolbar">
+            <div>
+                <h2 style="font-size: 1.3rem; color: #ffffff; margin: 0 0 4px;">Directorio de Usuarios</h2>
+                <span style="font-size: 0.82rem; color: #94a3b8;">Consulta perfiles, credenciales registradas y asignación de permisos</span>
+            </div>
+            <div class="user-search-box">
+                <span class="search-icon-svg">🔍</span>
+                <input type="text" id="userFilterInput" class="user-search-input" placeholder="Filtrar por nombre, correo o rol..." onkeyup="filterUserTable()">
+            </div>
         </div>
 
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Correo</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="user : ${listUsers}">
-                <td th:text="${user.id}">0</td>
-                <td th:text="${user.email}">correo</td>
-                <td th:text="${user.firstName}">nombre</td>
-                <td th:text="${user.lastName}">apellido</td>
-                <td th:text="${user.role}">ROLE_USER</td>
-                <td>
-                    <div class="button-row">
-                        <a class="button secondary" th:href="@{/users/{id}/edit(id=${user.id})}">Editar</a>
-                        <form th:if="${user.email != actorEmail}"
-                            th:action="@{/users/{id}/delete(id=${user.id})}" method="post"
-                            onsubmit="return confirm('¿Eliminar este usuario?')">
-                            <button class="button danger" type="submit">Eliminar</button>
-                        </form>
-                        <span th:if="${user.email == actorEmail}">Tu cuenta</span>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+        <!-- Tabla de Cuentas Premium -->
+        <section class="users-table-card">
+            <div style="overflow-x: auto;">
+                <table class="pro-users-table" id="usersTable">
+                    <thead>
+                    <tr>
+                        <th>Identidad del Usuario</th>
+                        <th>Rol de Seguridad</th>
+                        <th>Estado de Cuenta</th>
+                        <th style="text-align: right;">Acciones de Gestión</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${listUsers}">
+                        <td>
+                            <div class="user-profile-cell">
+                                <div class="user-avatar"
+                                     th:classappend="${user.role == 'ROLE_ADMIN' ? 'admin-avatar' : ''}"
+                                     th:text="${#strings.substring(user.firstName, 0, 1) + #strings.substring(user.lastName, 0, 1)}">US</div>
+                                <div>
+                                    <span class="user-name-title" th:text="|${user.firstName} ${user.lastName}|">Nombre Apellido</span>
+                                    <span class="user-email-subtitle" th:text="${user.email}">correo@logitrans.local</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge"
+                                  th:classappend="${user.role == 'ROLE_ADMIN' ? 'role-admin' : 'role-user'}"
+                                  th:text="${user.role == 'ROLE_ADMIN' ? 'Administrador' : 'Cliente / Operario'}">Rol</span>
+                        </td>
+                        <td>
+                            <span style="display: inline-flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #34d399;">
+                                <span style="width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 6px #34d399;"></span>
+                                ACTIVO
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-btns-wrap" style="justify-content: flex-end;">
+                                <a class="button btn-action-edit" th:href="@{/users/{id}/edit(id=${user.id})}">
+                                    <span>✏️</span> Editar
+                                </a>
+                                <form th:if="${user.email != actorEmail}" th:action="@{/users/{id}/delete(id=${user.id})}" method="post" onsubmit="return confirm('¿Confirmas la revocación y eliminación de esta cuenta en el directorio?')">
+                                    <button class="button btn-action-del" type="submit">
+                                        <span>🗑️</span> Eliminar
+                                    </button>
+                                </form>
+                                <span class="current-user-tag" th:if="${user.email == actorEmail}">SESIÓN ACTUAL</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(listUsers)}">
+                        <td colspan="4" class="table-empty" style="padding: 40px; text-align: center; color: #94a3b8;">No se encontraron cuentas activas registradas en el directorio.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+    <footer th:replace="~{fragments/admin-shell :: footer}"></footer>
 </div>
+
+<script>
+    function filterUserTable() {
+        const input = document.getElementById("userFilterInput");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("usersTable");
+        const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            const rowText = rows[i].textContent || rows[i].innerText;
+            if (rowText.toLowerCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+</script>
 </body>
 </html>
