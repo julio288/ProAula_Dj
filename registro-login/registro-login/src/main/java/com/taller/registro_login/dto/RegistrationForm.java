@@ -29,9 +29,6 @@ public class RegistrationForm {
     @Size(min = 2, max = 50, message = "El apellido debe tener entre 2 y 50 caracteres")
     private String lastName;
 
-    private String accountType = User.ROLE_USER;
-    private String adminCode;
-
     public User toUser() {
         return new User(
                 email.trim().toLowerCase(Locale.ROOT),
@@ -55,9 +52,4 @@ public class RegistrationForm {
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName == null ? null : lastName.trim(); }
 
-    public String getAccountType() { return accountType; }
-    public void setAccountType(String accountType) { this.accountType = accountType; }
-
-    public String getAdminCode() { return adminCode; }
-    public void setAdminCode(String adminCode) { this.adminCode = adminCode; }
 }

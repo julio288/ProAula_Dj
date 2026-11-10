@@ -346,13 +346,7 @@ public class AppController {
         }
         try {
             User user = registrationForm.toUser();
-            if (User.ROLE_USER.equals(registrationForm.getAccountType())) {
-                userService.register(user);
-            } else if (User.ROLE_ADMIN.equals(registrationForm.getAccountType())) {
-                userService.registerAdmin(user, registrationForm.getAdminCode());
-            } else {
-                throw new IllegalArgumentException("Selecciona un tipo de cuenta válido.");
-            }
+            userService.register(user);
             return "registro_exitoso";
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
@@ -367,9 +361,39 @@ public class AppController {
 
     @GetMapping("/users")
     public String listUsers(Model model, @AuthenticationPrincipal ApplicationUserPrincipal principal) {
+        populateUsersPage(model, principal);
+        return "usuarios";
+    }
+
+    @PostMapping("/users/admin")
+    public String createAdmin(@Valid @ModelAttribute("adminRegistrationForm") RegistrationForm registrationForm,
+                              BindingResult result,
+                              Model model,
+                              @AuthenticationPrincipal ApplicationUserPrincipal principal,
+                              RedirectAttributes redirectAttributes) {
+        if (!Objects.equals(registrationForm.getPassword(), registrationForm.getConfirmPassword())) {
+            result.rejectValue("confirmPassword", "password.mismatch", "Las contraseñas no coinciden.");
+        }
+        if (!result.hasErrors()) {
+            try {
+                userService.registerAdmin(registrationForm.toUser());
+                redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE,
+                        "La cuenta de administrador se creó correctamente.");
+                return "redirect:/users";
+            } catch (IllegalArgumentException exception) {
+                model.addAttribute("adminFormError", exception.getMessage());
+            }
+        }
+        populateUsersPage(model, principal);
+        return "usuarios";
+    }
+
+    private void populateUsersPage(Model model, ApplicationUserPrincipal principal) {
         model.addAttribute("listUsers", userService.findAll());
         model.addAttribute("actorEmail", principal.getEmail());
-        return "usuarios";
+        if (!model.containsAttribute("adminRegistrationForm")) {
+            model.addAttribute("adminRegistrationForm", new RegistrationForm());
+        }
     }
 
     @GetMapping("/users/{id}/edit")

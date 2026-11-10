@@ -83,6 +83,11 @@ body.admin-page{color-scheme:dark;--font:"IBM Plex Sans","Segoe UI Variable","Se
 .admin-page .text-button,.admin-page .text-link{color:var(--brand-2)}
 .admin-page .danger-text{color:#fb7185}
 .admin-page .empty-state,.admin-page .table-empty{color:var(--muted)}
+.admin-create-section{scroll-margin-top:24px}
+.admin-create-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:22px}
+.admin-create-form .button-row{margin-top:4px}
+.admin-create-form .button{min-width:240px}
+.admin-page .admin-create-form .field-error{color:#fda4af}
 
 /* NavegaciÃ³n compartida entre las Ã¡reas administrativas */
 .admin-page .main-nav a[href$="/admin/shipments"]::before{content:"â†—"}

@@ -129,9 +129,9 @@ Estos conceptos representan controles distintos en la aplicación:
 - Las contraseñas se almacenan usando BCrypt. El cierre de sesión invalida la sesión y
   elimina la cookie `JSESSIONID`.
 
-El registro normal asigna el rol `USER`. Para permitir registros con rol `ADMIN`, configura
-`APP_ADMIN_REGISTRATION_CODE` con un código privado y compártelo solo con quien deba usarlo.
-Si no está configurado, el registro de administradores queda deshabilitado.
+El registro público siempre crea cuentas `USER`. Para crear una cuenta `ADMIN`, inicia sesión
+con una cuenta administradora y usa la sección **Crear cuenta de administrador** en
+`/users`; esa ruta está protegida y no está disponible para usuarios normales.
 
 El acceso con Google también abre el panel correspondiente. La primera autenticación con un
 correo verificado crea automáticamente una cuenta de cliente; los siguientes accesos

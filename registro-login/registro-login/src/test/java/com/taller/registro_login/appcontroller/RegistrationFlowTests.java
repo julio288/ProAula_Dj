@@ -54,8 +54,7 @@ class RegistrationFlowTests {
                         .param("password", "ValidPass123!")
                         .param("confirmPassword", "ValidPass123!")
                         .param("firstName", "Test")
-                        .param("lastName", "Person")
-                        .param("accountType", User.ROLE_USER))
+                        .param("lastName", "Person"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("registro_exitoso"));
 
@@ -69,8 +68,7 @@ class RegistrationFlowTests {
                         .param("password", "ValidPass123!")
                         .param("confirmPassword", "DifferentPass123!")
                         .param("firstName", "Test")
-                        .param("lastName", "Person")
-                        .param("accountType", User.ROLE_USER))
+                        .param("lastName", "Person"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("registro"))
                 .andExpect(model().attributeHasFieldErrors("registrationForm", "confirmPassword"));
@@ -88,8 +86,7 @@ class RegistrationFlowTests {
                         .param("password", "ValidPass123!")
                         .param("confirmPassword", "ValidPass123!")
                         .param("firstName", "Test")
-                        .param("lastName", "Person")
-                        .param("accountType", User.ROLE_USER))
+                        .param("lastName", "Person"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("registro"))
                 .andExpect(model().attribute("error",
@@ -97,22 +94,22 @@ class RegistrationFlowTests {
     }
 
     @Test
-    void registersAnAdministratorOnlyThroughTheAdminCodeFlow() throws Exception {
-        when(userService.registerAdmin(any(User.class), org.mockito.ArgumentMatchers.eq("admin-code")))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+    void publicRegistrationCannotChooseTheAdministratorRole() throws Exception {
+        when(userService.register(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         mockMvc.perform(post("/process_register")
-                        .param("email", "admin@example.test")
+                        .param("email", "new-user@example.test")
                         .param("password", "ValidPass123!")
                         .param("confirmPassword", "ValidPass123!")
-                        .param("firstName", "Admin")
+                        .param("firstName", "New")
                         .param("lastName", "Person")
                         .param("accountType", User.ROLE_ADMIN)
                         .param("adminCode", "admin-code"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("registro_exitoso"));
 
-        verify(userService).registerAdmin(any(User.class), org.mockito.ArgumentMatchers.eq("admin-code"));
-        verify(userService, never()).register(any(User.class));
+        verify(userService).register(org.mockito.ArgumentMatchers.argThat(
+                user -> User.ROLE_USER.equals(user.getRole())));
+        verify(userService, never()).registerAdmin(any(User.class));
     }
 }

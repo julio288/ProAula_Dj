@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -64,6 +66,9 @@ class UserAccessTests {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void dashboardRequiresAuthentication() throws Exception {
         mockMvc.perform(get("/dashboard"))
@@ -80,10 +85,14 @@ class UserAccessTests {
                         org.hamcrest.Matchers.containsString("/oauth2/authorization/google"))));
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Iniciar Sesión")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Iniciar sesión")));
         mockMvc.perform(get("/register"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Crear Nueva Cuenta")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Crear tu cuenta")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("Nivel de Autorización"))))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("adminCode"))));
     }
 
     @Test
@@ -462,7 +471,48 @@ class UserAccessTests {
 
         mockMvc.perform(get("/users").with(user(new CustomUserDetails(admin))))
                 .andExpect(status().isOk())
-                .andExpect(view().name("usuarios"));
+                .andExpect(view().name("usuarios"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "Crear cuenta de administrador")));
+    }
+
+    @Test
+    void administratorCanCreateAdminAccountFromUserManagementPage() throws Exception {
+        User actor = new User("admin-create-actor@example.test", "encoded-password", "Admin", "Creador");
+        actor.setRole(User.ROLE_ADMIN);
+        actor = userRepository.save(actor);
+
+        mockMvc.perform(post("/users/admin")
+                        .with(user(new CustomUserDetails(actor)))
+                        .with(csrf())
+                        .param("firstName", "Nuevo")
+                        .param("lastName", "Admin")
+                        .param("email", "new-admin@example.test")
+                        .param("password", "InitialPass123!")
+                        .param("confirmPassword", "InitialPass123!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users"));
+
+        User created = userRepository.findByEmail("new-admin@example.test").orElseThrow();
+        assertEquals(User.ROLE_ADMIN, created.getRole());
+        assertTrue(passwordEncoder.matches("InitialPass123!", created.getPassword()));
+    }
+
+    @Test
+    void regularUserCannotCreateAdminAccount() throws Exception {
+        User regularUser = new User("regular-create-actor@example.test", "encoded", "Usuario", "Prueba");
+
+        mockMvc.perform(post("/users/admin")
+                        .with(user(new CustomUserDetails(regularUser)))
+                        .with(csrf())
+                        .param("firstName", "No")
+                        .param("lastName", "Autorizado")
+                        .param("email", "forbidden-admin@example.test")
+                        .param("password", "InitialPass123!")
+                        .param("confirmPassword", "InitialPass123!"))
+                .andExpect(status().isForbidden());
+
+        assertTrue(userRepository.findByEmail("forbidden-admin@example.test").isEmpty());
     }
 
     private FreightRequestForm requestForm(Long laneId) {

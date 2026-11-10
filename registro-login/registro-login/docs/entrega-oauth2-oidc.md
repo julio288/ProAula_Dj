@@ -2,33 +2,33 @@
 
 ## Respuestas de análisis
 
-1. **¿Cuál es la diferencia entre autenticación y autorización?**
+1. **¿Cuál es la diferencia entre autenticación y autorización?**  
    La autenticación verifica quién es la persona que inició sesión. La autorización decide
    qué recursos puede usar esa persona una vez identificada.
 
-2. **¿Por qué OAuth 2.0 no es por sí mismo un protocolo de autenticación?**
+2. **¿Por qué OAuth 2.0 no es por sí mismo un protocolo de autenticación?**  
    OAuth 2.0 delega autorización para acceder a recursos; no define por sí solo un formato
    estándar para afirmar la identidad del usuario.
 
-3. **¿Qué añade OpenID Connect al flujo OAuth 2.0?**
+3. **¿Qué añade OpenID Connect al flujo OAuth 2.0?**  
    OIDC agrega una capa de identidad interoperable, incluido el ID Token con claims
    autenticados y endpoints estándar de descubrimiento.
 
-4. **¿Qué función cumple el ID Token?**
+4. **¿Qué función cumple el ID Token?**  
    Comunica a la aplicación la identidad autenticada y sus claims. Su claim `sub` identifica
    de forma estable al usuario dentro del emisor; no es una contraseña ni un token para
    autorizar cualquier API.
 
-5. **¿Qué sucede cuando alguien solicita `/perfil` sin sesión?**
+5. **¿Qué sucede cuando alguien solicita `/perfil` sin sesión?**  
    Spring Security lo considera un recurso protegido y redirige a `/login`. Desde esa página
    se puede iniciar el flujo de Google si está activa la configuración OIDC.
 
-6. **¿Por qué no se debe publicar el Client Secret?**
+6. **¿Por qué no se debe publicar el Client Secret?**  
    Es una credencial confidencial del cliente OAuth. Si se filtra, otra persona podría
    suplantar la aplicación en el flujo OAuth; debe guardarse fuera del repositorio y
    rotarse si se expone.
 
-7. **¿Qué diferencia hay entre cerrar sesión en la aplicación y en Google?**
+7. **¿Qué diferencia hay entre cerrar sesión en la aplicación y en Google?**  
    El logout de esta aplicación invalida la sesión local y su cookie. No cierra la sesión
    general del navegador en Google, por lo que Google puede autenticar de nuevo sin pedir
    la contraseña.

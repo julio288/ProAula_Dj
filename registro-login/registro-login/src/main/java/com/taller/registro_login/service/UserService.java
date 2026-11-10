@@ -4,7 +4,6 @@ import com.taller.registro_login.model.User;
 import com.taller.registro_login.repository.FreightRequestRepository;
 import com.taller.registro_login.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,16 +18,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final FreightRequestRepository freightRequestRepository;
     private final PasswordEncoder passwordEncoder;
-    private final String adminRegistrationCode;
-
     public UserService(UserRepository userRepository,
                        FreightRequestRepository freightRequestRepository,
-                       PasswordEncoder passwordEncoder,
-                       @Value("${APP_ADMIN_REGISTRATION_CODE:}") String adminRegistrationCode) {
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.freightRequestRepository = freightRequestRepository;
         this.passwordEncoder = passwordEncoder;
-        this.adminRegistrationCode = adminRegistrationCode;
     }
 
     @Transactional
@@ -42,10 +37,7 @@ public class UserService {
     }
 
     @Transactional
-    public User registerAdmin(User user, String suppliedCode) {
-        if (adminRegistrationCode.isBlank() || !Objects.equals(adminRegistrationCode, suppliedCode)) {
-            throw new IllegalArgumentException("El código de administrador no es válido.");
-        }
+    public User registerAdmin(User user) {
         return register(user, User.ROLE_ADMIN);
     }
 

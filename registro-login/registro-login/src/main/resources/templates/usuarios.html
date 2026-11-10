@@ -26,7 +26,7 @@
         body.users-page {
             font-family: 'Inter', -apple-system, sans-serif !important;
             background-color: var(--user-bg) !important;
-            background-image:
+            background-image: 
                 radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.07) 0px, transparent 50%) !important;
         }
@@ -327,8 +327,8 @@
                 <h1 class="users-hero-title">Gestión de Cuentas &amp; <span>Accesos</span></h1>
                 <p style="color: #94a3b8; max-width: 620px; font-size: 0.92rem; line-height: 1.6;">Control centralizado de identidades, privilegios y roles de acceso para el personal operativo y clientes en la red corporativa de LogiTrans.</p>
                 <div class="cta-row" style="margin-top: 20px;">
-                    <a class="button primary" th:href="@{/register}" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); border: none; box-shadow: 0 10px 24px -6px rgba(139, 92, 246, 0.4);">
-                        <span>＋</span> Registrar Nueva Cuenta
+                    <a class="button primary" href="#admin-account-form">
+                        Crear cuenta de administrador
                     </a>
                     <a class="button secondary" th:href="@{/admin}" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); color: #fff;">
                         Volver a Centro de Operaciones
@@ -372,6 +372,53 @@
         <!-- Mensajes Flash -->
         <div class="alert alert-success" role="status" th:if="${message}" th:text="${message}" style="border-radius: 12px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #6ee7b7;"></div>
         <div class="alert alert-error" role="alert" th:if="${error}" th:text="${error}" style="border-radius: 12px;"></div>
+        <div class="alert alert-error" role="alert" th:if="${adminFormError}" th:text="${adminFormError}"></div>
+
+        <section class="content-section admin-create-section" id="admin-account-form">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Acceso restringido</p>
+                    <h2>Crear cuenta de administrador</h2>
+                </div>
+                <span class="section-caption">Solo administradores pueden realizar esta acción</span>
+            </div>
+            <form th:action="@{/users/admin}" th:object="${adminRegistrationForm}" method="post"
+                  class="admin-item form-card grid-form admin-create-form">
+                <div class="form-group">
+                    <label for="adminFirstName">Nombre</label>
+                    <input id="adminFirstName" type="text" th:field="*{firstName}" required minlength="2"
+                           maxlength="50" autocomplete="given-name" placeholder="Nombre">
+                    <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="adminLastName">Apellido</label>
+                    <input id="adminLastName" type="text" th:field="*{lastName}" required minlength="2"
+                           maxlength="50" autocomplete="family-name" placeholder="Apellido">
+                    <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+                </div>
+                <div class="form-group full-width">
+                    <label for="adminEmail">Correo electrónico</label>
+                    <input id="adminEmail" type="email" th:field="*{email}" required maxlength="100"
+                           autocomplete="email" placeholder="nombre@empresa.com">
+                    <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Contraseña inicial</label>
+                    <input id="adminPassword" type="password" th:field="*{password}" required minlength="8"
+                           maxlength="72" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+                    <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="adminConfirmPassword">Confirmar contraseña</label>
+                    <input id="adminConfirmPassword" type="password" th:field="*{confirmPassword}" required
+                           maxlength="72" autocomplete="new-password" placeholder="Vuelve a escribir la contraseña">
+                    <span class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+                </div>
+                <div class="button-row full-width">
+                    <button class="button" type="submit">Crear cuenta de administrador</button>
+                </div>
+            </form>
+        </section>
 
         <!-- Barra de Búsqueda y Filtro Rápido en Vivo -->
         <div class="directory-toolbar">
@@ -401,7 +448,7 @@
                     <tr th:each="user : ${listUsers}">
                         <td>
                             <div class="user-profile-cell">
-                                <div class="user-avatar"
+                                <div class="user-avatar" 
                                      th:classappend="${user.role == 'ROLE_ADMIN' ? 'admin-avatar' : ''}"
                                      th:text="${#strings.substring(user.firstName, 0, 1) + #strings.substring(user.lastName, 0, 1)}">US</div>
                                 <div>
@@ -411,7 +458,7 @@
                             </div>
                         </td>
                         <td>
-                            <span class="role-badge"
+                            <span class="role-badge" 
                                   th:classappend="${user.role == 'ROLE_ADMIN' ? 'role-admin' : 'role-user'}"
                                   th:text="${user.role == 'ROLE_ADMIN' ? 'Administrador' : 'Cliente / Operario'}">Rol</span>
                         </td>

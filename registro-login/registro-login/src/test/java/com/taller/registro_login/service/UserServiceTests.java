@@ -23,7 +23,7 @@ class UserServiceTests {
     private final FreightRequestRepository freightRequestRepository = mock(FreightRequestRepository.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private final UserService userService = new UserService(
-            userRepository, freightRequestRepository, passwordEncoder, "admin2027");
+            userRepository, freightRequestRepository, passwordEncoder);
 
     @Test
     void publicRegistrationAlwaysAssignsUserRoleAndEncodesPassword() {
@@ -45,32 +45,10 @@ class UserServiceTests {
         when(passwordEncoder.encode("plain-password")).thenReturn("encoded-password");
         when(userRepository.save(user)).thenReturn(user);
 
-        User saved = userService.registerAdmin(user, "admin2027");
+        User saved = userService.registerAdmin(user);
 
         assertThat(saved.getRole()).isEqualTo(User.ROLE_ADMIN);
         assertThat(saved.getPassword()).isEqualTo("encoded-password");
-    }
-
-    @Test
-    void publicAdminRegistrationRequiresTheConfiguredCode() {
-        User user = user("admin@example.test", "plain-password");
-
-        assertThatThrownBy(() -> userService.registerAdmin(user, "incorrecto"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("El código de administrador no es válido.");
-        verify(userRepository, never()).save(org.mockito.ArgumentMatchers.any(User.class));
-    }
-
-    @Test
-    void adminRegistrationRejectsRequestsWhenNoCodeIsConfigured() {
-        UserService serviceWithoutCode = new UserService(
-                userRepository, freightRequestRepository, passwordEncoder, "");
-        User user = user("admin@example.test", "plain-password");
-
-        assertThatThrownBy(() -> serviceWithoutCode.registerAdmin(user, "any-code"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("El código de administrador no es válido.");
-        verify(userRepository, never()).save(org.mockito.ArgumentMatchers.any(User.class));
     }
 
     @Test

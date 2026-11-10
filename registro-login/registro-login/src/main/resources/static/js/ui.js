@@ -3,20 +3,6 @@
   const $ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const accountType = document.querySelector('#accountType');
-  const adminCodeGroup = document.querySelector('#adminCodeGroup');
-  const adminCodeInput = document.querySelector('#adminCode');
-  if (accountType && adminCodeGroup && adminCodeInput) {
-    const updateAdminCodeVisibility = () => {
-      const isAdmin = accountType.value === 'ROLE_ADMIN';
-      adminCodeGroup.hidden = !isAdmin;
-      adminCodeInput.required = isAdmin;
-      if (!isAdmin) adminCodeInput.value = '';
-    };
-    accountType.addEventListener('change', updateAdminCodeVisibility);
-    updateAdminCodeVisibility();
-  }
-
   const editForm = document.querySelector('.edit-user-form');
   if (editForm) {
     const firstName = editForm.querySelector('#firstName');
@@ -74,15 +60,42 @@
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'pw-toggle';
-    btn.textContent = '👁️';
     btn.setAttribute('aria-label', 'Mostrar contraseña');
+    btn.setAttribute('aria-pressed', 'false');
+    const updateIcon = show => {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('width', '20');
+      svg.setAttribute('height', '20');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '1.8');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+      svg.setAttribute('aria-hidden', 'true');
+      const eye = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      eye.setAttribute('d', 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z');
+      const pupil = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      pupil.setAttribute('cx', '12');
+      pupil.setAttribute('cy', '12');
+      pupil.setAttribute('r', '3');
+      svg.append(eye, pupil);
+      if (show) {
+        const slash = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        slash.setAttribute('d', 'm3 3 18 18');
+        svg.append(slash);
+      }
+      btn.replaceChildren(svg);
+    };
+    updateIcon(false);
     input.replaceWith(wrap);
     wrap.append(input, btn);
     btn.addEventListener('click', () => {
       const show = input.type === 'password';
       input.type = show ? 'text' : 'password';
-      btn.textContent = show ? '🙈' : '👁️';
       btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      btn.setAttribute('aria-pressed', String(show));
+      updateIcon(show);
     });
   });
 

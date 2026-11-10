@@ -29,7 +29,7 @@
         body.admin-page {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
             background-color: var(--soc-bg) !important;
-            background-image:
+            background-image: 
                 radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(114, 128, 255, 0.07) 0px, transparent 50%),
                 radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.03) 0, transparent 70%) !important;
@@ -484,10 +484,10 @@
                     <p>Eventos obtenidos desde Windows Event Log y alertas generadas por cambios de disponibilidad.</p>
                 </div>
                 <div class="soc-filter-btns">
-                    <a th:href="@{/admin/monitoring(filter='all')}"
+                    <a th:href="@{/admin/monitoring(filter='all')}" 
                        class="button button-compact"
                        th:style="${activeFilter == 'all' ? 'background: var(--soc-cyan); color: #000; font-weight: 700;' : 'background: rgba(255,255,255,0.06); color: #fff;'}">Todos los Eventos</a>
-                    <a th:href="@{/admin/monitoring(filter='anomalies')}"
+                    <a th:href="@{/admin/monitoring(filter='anomalies')}" 
                        class="button button-compact"
                        th:style="${activeFilter == 'anomalies' ? 'background: var(--soc-red); color: #fff; font-weight: 700; box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);' : 'background: rgba(255,255,255,0.06); color: #fff;'}">Solo anomalías</a>
                 </div>
@@ -508,11 +508,11 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="log : ${auditLogs}"
+                    <tr th:each="log : ${auditLogs}" 
                         th:classappend="${log.anomaly ? 'is-threat' : ''}">
                         <td class="time-cell" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></td>
                         <td>
-                            <span class="sev-tag"
+                            <span class="sev-tag" 
                                   th:classappend="${log.level == 'INFO' ? 'sev-info' : (log.level == 'WARNING' ? 'sev-warning' : 'sev-critical')}"
                                   th:text="${log.level}"></span>
                         </td>
